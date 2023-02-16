@@ -10,14 +10,32 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:notter.helloWorld"
+    "onCommand:notter.gituser",
+    "onCommand:notter.version",
+    "onCommand:notter.pwd"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "notter",
+          "name": "notter"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "notter.helloWorld",
-        "title": "Hello World"
+        "command": "notter.gituser",
+        "title": "Notter: Git User Check"
+      },
+      {
+        "command": "notter.version",
+        "title": "Notter: Version Check"
+      },
+      {
+        "command": "notter.discover",
+        "title": "Notter: Discover Comments"
       }
     ]
   },

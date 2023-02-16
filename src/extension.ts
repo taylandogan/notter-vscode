@@ -1,26 +1,63 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { NoteProvider } from './sidebar';
+import { Comment } from './model';
+import { execShell } from './utils';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "notter-vscode" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('notter.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from notter!');
+export const fetchNotes = async (): Promise<{[key: string]: [number, string]}> => {
+	const discoveredComments = await execShell('notter discover', true);
+	const foundComments = JSON.parse(discoveredComments).map((comment: any) => {
+		return new Comment(comment.filepath, comment.text, comment.line, comment.type, comment.multiline);
 	});
 
-	context.subscriptions.push(disposable);
+	let noteDict = {};
+	for (const comment of foundComments) {
+		if (comment.filepath in noteDict) {
+			noteDict[comment.filepath].push([comment.line, comment.text]);
+		} else {
+			noteDict[comment.filepath] = [[comment.line, comment.text]];
+		}
+	}
+
+	return noteDict;
 }
 
-// This method is called when your extension is deactivated
+
+export async function activate(context: vscode.ExtensionContext) {
+	console.log('Congratulations, your extension "notter-vscode" is now active!');
+	let comments: {[key: string]: [number, string]} = await fetchNotes();
+	vscode.window.showInformationMessage(`Fetched comments: ${comments}`)
+	vscode.window.registerTreeDataProvider('notter', new NoteProvider(comments));
+
+	const git_user_check = vscode.commands.registerCommand('notter.gituser', async () => {
+		try {
+			const username = await execShell("git config --get user.name");
+			const email = await execShell("git config --get user.email");
+			vscode.window.showInformationMessage(`Using Git user: ${username} / ${email}`, { modal: false });
+		} catch (err) {
+			vscode.window.showErrorMessage("Please make sure that Git user.name and user.email configs are defined");
+		}
+	});
+
+	let version_check = vscode.commands.registerCommand('notter.version', async () => {
+		try {
+			let version = await execShell('notter --version', true);
+			vscode.window.showInformationMessage(`You are using Notter ${version}`, { modal: false });
+		} catch(err) {
+		}
+	});
+
+	let discover_notes = vscode.commands.registerCommand('notter.discover', async () => {
+		try {
+			const notes = await fetchNotes();
+			vscode.window.showInformationMessage(JSON.stringify(notes));
+		} catch(err) {
+		}
+	});
+
+	context.subscriptions.push(git_user_check);
+	context.subscriptions.push(version_check);
+	context.subscriptions.push(discover_notes)
+}
+
 export function deactivate() {}
