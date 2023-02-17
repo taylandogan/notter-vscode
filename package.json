@@ -36,6 +36,14 @@
       {
         "command": "notter.discover",
         "title": "Notter: Discover Comments"
+      },
+      {
+        "command": "notter.refresh",
+        "title": "Notter: Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
       }
     ]
   },

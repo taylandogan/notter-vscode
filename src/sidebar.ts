@@ -12,7 +12,12 @@ class FileTreeItem extends vscode.TreeItem {
 
 
 export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
-	onDidChangeTreeData?: vscode.Event<FileTreeItem|null|undefined>|undefined;
+	private _onDidChangeTreeData: vscode.EventEmitter<FileTreeItem | undefined | null | void> = new vscode.EventEmitter<FileTreeItem | undefined | null | void>();
+	readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+
+	refresh(): void {
+	  this._onDidChangeTreeData.fire();
+	}
 
 	data: FileTreeItem[];
 

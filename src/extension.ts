@@ -26,8 +26,10 @@ export const fetchNotes = async (): Promise<{[key: string]: [number, string]}> =
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "notter-vscode" is now active!');
 	let comments: {[key: string]: [number, string]} = await fetchNotes();
-	vscode.window.showInformationMessage(`Fetched comments: ${comments}`)
-	vscode.window.registerTreeDataProvider('notter', new NoteProvider(comments));
+	const noteProvider = new NoteProvider(comments);
+	vscode.window.registerTreeDataProvider('notter', noteProvider);
+
+	vscode.commands.registerCommand('notter.refresh', () => noteProvider.refresh());
 
 	const git_user_check = vscode.commands.registerCommand('notter.gituser', async () => {
 		try {
