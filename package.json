@@ -16,11 +16,29 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "notter-explorer",
+          "title": "Notter",
+          "icon": "$(pass)"
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "notter-explorer": [
         {
           "id": "notter",
-          "name": "notter"
+          "name": "Discovered Comments"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "notter.refresh",
+          "when": "view == notter",
+          "group": "navigation"
         }
       ]
     },
