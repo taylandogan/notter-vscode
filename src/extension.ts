@@ -5,7 +5,7 @@ import { execShell } from './utils';
 
 
 export const fetchNotes = async (): Promise<{[key: string]: [number, string]}> => {
-	const discoveredComments = await execShell('notter discover', true);
+	const discoveredComments = await execShell('notter discover');
 	const foundComments = JSON.parse(discoveredComments).map((comment: any) => {
 		return new Comment(comment.filepath, comment.text, comment.line, comment.type, comment.multiline);
 	});
@@ -43,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let version_check = vscode.commands.registerCommand('notter.version', async () => {
 		try {
-			let version = await execShell('notter --version', true);
+			let version = await execShell('notter --version');
 			vscode.window.showInformationMessage(`You are using Notter ${version}`, { modal: false });
 		} catch(err) {
 			vscode.window.showErrorMessage("Please make sure that notter is installed and available in your PATH: " + err);
