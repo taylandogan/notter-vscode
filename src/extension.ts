@@ -46,6 +46,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			let version = await execShell('notter --version', true);
 			vscode.window.showInformationMessage(`You are using Notter ${version}`, { modal: false });
 		} catch(err) {
+			vscode.window.showErrorMessage("Please make sure that notter is installed and available in your PATH: " + err);
 		}
 	});
 
@@ -54,6 +55,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			const notes = await fetchNotes();
 			vscode.window.showInformationMessage(JSON.stringify(notes));
 		} catch(err) {
+			vscode.window.showErrorMessage("Error while discovering notes: " + err);
 		}
 	});
 
