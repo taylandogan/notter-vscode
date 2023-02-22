@@ -24,7 +24,7 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 	constructor(comments: {[key: string]: [number, string]}) {
 		this.data = [];
 
-		vscode.window.showInformationMessage(JSON.stringify(comments));
+		// vscode.window.showInformationMessage(JSON.stringify(comments));
 		for (const [filepath, notes] of Object.entries(comments)) {
 			let noteItems = notes.map((note) => {
 				return new FileTreeItem(`${note[0]}: ${note[1]}`);
