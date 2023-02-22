@@ -44,24 +44,23 @@ export const initNotter = async (): Promise<[boolean, string]> => {
 }
 
 export const fetchNotes = async (): Promise<{[key: string]: [number, string]}> => {
-	const version = await checkNotterVersion();
-	if (version === null) {
-		vscode.window.showErrorMessage("Please make sure that notter is installed and initialized");
-		return {};
-	}
-
-	const discoveredComments: string = await discoverNotes();
-	const foundComments = JSON.parse(discoveredComments).map((comment: any) => {
-		return new Comment(comment.filepath, comment.text, comment.line, comment.type, comment.multiline);
-	});
-
 	let noteDict = {};
-	for (const comment of foundComments) {
-		if (comment.filepath in noteDict) {
-			noteDict[comment.filepath].push([comment.line, comment.text]);
-		} else {
-			noteDict[comment.filepath] = [[comment.line, comment.text]];
+
+	try {
+		const discoveredComments: string = await discoverNotes();
+		const foundComments = JSON.parse(discoveredComments).map((comment: any) => {
+			return new Comment(comment.filepath, comment.text, comment.line, comment.type, comment.multiline);
+		});
+
+		for (const comment of foundComments) {
+			if (comment.filepath in noteDict) {
+				noteDict[comment.filepath].push([comment.line, comment.text]);
+			} else {
+				noteDict[comment.filepath] = [[comment.line, comment.text]];
+			}
 		}
+	} catch (err) {
+		vscode.window.showErrorMessage("Error while fetching notes: " + err);
 	}
 
 	return noteDict;

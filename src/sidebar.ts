@@ -15,23 +15,29 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 	private _onDidChangeTreeData: vscode.EventEmitter<FileTreeItem | undefined | null | void> = new vscode.EventEmitter<FileTreeItem | undefined | null | void>();
 	readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-	refresh(): void {
-	  this._onDidChangeTreeData.fire();
-	}
-
 	data: FileTreeItem[];
 
 	constructor(comments: {[key: string]: [number, string]}) {
-		this.data = [];
+		this.data = this.buildTree(comments);
+	}
 
-		// vscode.window.showInformationMessage(JSON.stringify(comments));
+	buildTree(comments: {[key: string]: [number, string]}): FileTreeItem[] {
+		let data: FileTreeItem[] = [];
+
 		for (const [filepath, notes] of Object.entries(comments)) {
 			let noteItems = notes.map((note) => {
 				return new FileTreeItem(`${note[0]}: ${note[1]}`);
 			});
 
-			this.data.push(new FileTreeItem(filepath, noteItems));
+			data.push(new FileTreeItem(filepath, noteItems));
 		}
+
+		return data;
+	}
+
+	refresh(comments: {[key: string]: [number, string]}): void {
+		this.data = this.buildTree(comments);
+		this._onDidChangeTreeData.fire();
 	}
 
 	getTreeItem(element: FileTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {

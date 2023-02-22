@@ -54,8 +54,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let discover_notes = vscode.commands.registerCommand('notter.discover', async () => {
 		try {
-			this.comments = await fetchNotes();
-			vscode.window.showInformationMessage("Notes discovered", { modal: false });
+			comments = await fetchNotes();
+			noteProvider.refresh(comments);
+			vscode.window.showInformationMessage(`Notes updated`, { modal: false });
 		} catch(err) {
 			vscode.window.showErrorMessage("Error while discovering notes: " + err);
 		}
