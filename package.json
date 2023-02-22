@@ -9,11 +9,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:notter.gituser",
-    "onCommand:notter.version",
-    "onCommand:notter.pwd"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
@@ -45,6 +40,10 @@
       {
         "command": "notter.discover",
         "title": "Notter: Discover Comments"
+      },
+      {
+        "command": "notter.init",
+        "title": "Notter: Initialize Notter Instance"
       }
     ]
   },
