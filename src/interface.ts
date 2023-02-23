@@ -4,7 +4,7 @@ import { execShell } from "./utils";
 
 export const getGitUsername = async (): Promise<string|null> => {
 	try {
-		return await execShell("git config user.name");
+		return await execShell("git config user.name", false);
 	} catch (err) {
 		return null;
 	}
@@ -12,7 +12,7 @@ export const getGitUsername = async (): Promise<string|null> => {
 
 export const getGitEmail = async (): Promise<string|null> => {
 	try {
-		return await execShell("git config user.email");
+		return await execShell("git config user.email", false);
 	} catch (err) {
 		return null;
 	}

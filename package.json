@@ -45,7 +45,17 @@
         "command": "notter.init",
         "title": "Notter: Initialize Notter Instance"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Notter",
+      "properties": {
+        "notter.projectSourceFolder": {
+          "type": "string",
+          "default": "",
+          "description": "The folder where the project source code is located"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",

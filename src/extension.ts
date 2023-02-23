@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
-import { execShell } from './utils';
+import { configCheck } from './utils';
 import { checkNotterVersion, fetchNotes, getGitEmail, getGitUsername, initNotter } from './interface';
+import { SRC_PATH_CONFIG_LABEL } from './constants';
 
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -40,6 +41,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let init_notter = vscode.commands.registerCommand('notter.init', async () => {
 		try {
+			if (!configCheck(SRC_PATH_CONFIG_LABEL)) { return; }
+
 			const [initialized, message]: [boolean, string] = await initNotter();
 
 			if (initialized) {
@@ -54,6 +57,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let discover_notes = vscode.commands.registerCommand('notter.discover', async () => {
 		try {
+			if (!configCheck(SRC_PATH_CONFIG_LABEL)) { return; }
+
 			comments = await fetchNotes();
 			noteProvider.refresh(comments);
 			vscode.window.showInformationMessage(`Notes updated`, { modal: false });
