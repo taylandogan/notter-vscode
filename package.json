@@ -2,7 +2,23 @@
   "name": "notter-vscode",
   "displayName": "Notter",
   "description": "VSCode plugin for Notter",
+  "keyword": [
+    "todo",
+    "comment",
+    "notter",
+    "task"
+  ],
   "version": "0.0.1",
+  "publisher": "taylandogan",
+  "homepage": "https://github.com/taylandogan/notter-vscode",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taylandogan/notter-vscode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/taylandogan/notter-vscode/issues",
+    "email": "taylandogan.nl@gmail.com"
+  },
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -43,7 +59,7 @@
       },
       {
         "command": "notter.init",
-        "title": "Notter: Initialize Notter Instance"
+        "title": "Notter: Initiaze Notter Instance"
       }
     ],
     "configuration": {

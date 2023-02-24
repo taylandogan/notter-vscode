@@ -1,7 +1,8 @@
 # Notter
 
 Notter is a VSCode plugin that helps you manage TODOs or NOTEs within your codebase.
-It is currently in development, yet it will have features such as priority setting, reminders, archiving and more.
+It is currently in development, so it cannot do much and it only supports Python codebases.
+Yet it will have features such as priority setting, reminders, archiving and more.
 
 I realized the already existing solutions are restrictive since they treat TODOs as simple comments in your source files.
 Whereas, I think there is more to a TODO line in a codebase, and it could make developers' lives easier.
@@ -10,6 +11,7 @@ Whereas, I think there is more to a TODO line in a codebase, and it could make d
 
 Currently, Notter can only visualize the todos and comments in your project. But soon you'll be able to:
 
+- Use the package in other codebases, not just Python
 - Filter TODOs by keyword
 - Prioritize TODOs
 - Set a reminder for TODOs
@@ -31,6 +33,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
+The biggest caveat of this package is that it only works for Python codebases now.
 As mentioned before, Notter VSCode plugin only works for MacOS for the time being (Tested on MacOS Monterey 12.3).
 Also the plugin cannot do much other than discovering and displaying TODOs in your codebase at the moment.
 
