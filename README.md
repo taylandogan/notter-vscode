@@ -1,71 +1,51 @@
-# notter-vscode README
+# Notter
 
-This is the README for your extension "notter-vscode". After writing up a brief description, we recommend including the following sections.
+Notter is a VSCode plugin that helps you manage TODOs or NOTEs within your codebase.
+It is currently in development, yet it will have features such as priority setting, reminders, archiving and more.
+
+I realized the already existing solutions are restrictive since they treat TODOs as simple comments in your source files.
+Whereas, I think there is more to a TODO line in a codebase, and it could make developers' lives easier.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Currently, Notter can only visualize the todos and comments in your project. But soon you'll be able to:
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Filter TODOs by keyword
+- Prioritize TODOs
+- Set a reminder for TODOs
+- Export all your TODOs
+- Archive TODOs for further analysis
+- .. and more
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Notter VSCode plugin actually depends on a Python package called Notter (https://github.com/taylandogan/notter).
+But the Python package comes with the plugin already along with all the dependencies as a single executable file of size ~5.9MBs at the moment.
+And this executable is generated only for MacOS for the time being. Thus, it is not possible to use Notter VSCode plugin using other operating systems for now.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-- `myExtension.enable`: Enable/disable this extension.
-- `myExtension.thing`: Set to `blah` to do something.
+- `notter.projectSourceFolder`: Full path of the source folder that you want Notter to work on.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+As mentioned before, Notter VSCode plugin only works for MacOS for the time being (Tested on MacOS Monterey 12.3).
+Also the plugin cannot do much other than discovering and displaying TODOs in your codebase at the moment.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.1.0
 
-### 1.0.0
+Initial release of Notter VSCode plugin that can discover and display TODOs and comments (as NOTEs).
 
-Initial release of ...
-
-### 1.0.1
+<!-- ### 1.0.1
 
 Fixed issue #.
 
 ### 1.1.0
 
-Added features X, Y, and Z.
+Added features X, Y, and Z. -->
 
 ---
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-- Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-- Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
