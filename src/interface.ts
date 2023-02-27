@@ -2,22 +2,6 @@ import * as vscode from 'vscode';
 import { Comment } from './model';
 import { execShell } from "./utils";
 
-export const getGitUsername = async (): Promise<string|null> => {
-	try {
-		return await execShell("git config user.name", false);
-	} catch (err) {
-		return null;
-	}
-}
-
-export const getGitEmail = async (): Promise<string|null> => {
-	try {
-		return await execShell("git config user.email", false);
-	} catch (err) {
-		return null;
-	}
-}
-
 export const checkNotterVersion = async (): Promise<string|null> => {
 	try {
 		return await execShell('notter --version');
@@ -34,9 +18,9 @@ export const discoverNotes = async (): Promise<string> => {
     }
 }
 
-export const initNotter = async (): Promise<[boolean, string]> => {
+export const initNotter = async (username: string, email: string): Promise<[boolean, string]> => {
     try {
-        let output = await execShell('notter --init');
+        let output = await execShell(`notter --init ${username} ${email}`);
         return [true, "Notter instance initialized properly"];
     } catch (err) {
         return [false, err];

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { configCheck } from './utils';
-import { checkNotterVersion, fetchNotes, getGitEmail, getGitUsername, initNotter } from './interface';
-import { SRC_PATH_CONFIG_LABEL } from './constants';
+import { checkNotterVersion, fetchNotes, initNotter } from './interface';
+import { SRC_PATH_CONFIG_LABEL, USERNAME_CONFIG_LABEL, EMAIL_CONFIG_LABEL } from './constants';
 
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -10,25 +10,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	let comments: {[key: string]: [number, string]} = {};
 	const noteProvider = new NoteProvider(comments);
 	vscode.window.registerTreeDataProvider('notter', noteProvider);
-
-	const git_user_check = vscode.commands.registerCommand('notter.gituser', async () => {
-		try {
-			const username = await getGitUsername();
-			const email = await getGitEmail();
-
-			if (username === null) {
-				vscode.window.showErrorMessage("Please make sure that Git user.name config is defined");
-			}
-
-			if (email === null) {
-				vscode.window.showErrorMessage("Please make sure that Git user.email config is defined");
-			}
-
-			vscode.window.showInformationMessage(`Using Git user: ${username} / ${email}`, { modal: false });
-		} catch (err) {
-			vscode.window.showErrorMessage("Please make sure that Git user.name and user.email configs are defined");
-		}
-	});
 
 	let version_check = vscode.commands.registerCommand('notter.version', async () => {
 		try {
@@ -41,9 +22,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let init_notter = vscode.commands.registerCommand('notter.init', async () => {
 		try {
-			if (!configCheck(SRC_PATH_CONFIG_LABEL)) { return; }
+			if ( !configCheck(USERNAME_CONFIG_LABEL) || !configCheck(EMAIL_CONFIG_LABEL) || !configCheck(SRC_PATH_CONFIG_LABEL) ) {
+				return;
+			}
 
-			const [initialized, message]: [boolean, string] = await initNotter();
+			// TODO: Add a check for the username and email format they should not include a space
+			const username: string = vscode.workspace.getConfiguration('notter').get<string>(USERNAME_CONFIG_LABEL);
+			const email: string = vscode.workspace.getConfiguration('notter').get<string>(EMAIL_CONFIG_LABEL);
+			const [initialized, message]: [boolean, string] = await initNotter(username, email);
 
 			if (initialized) {
 				vscode.window.showInformationMessage(`${message}`, { modal: false });
@@ -67,7 +53,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	context.subscriptions.push(git_user_check);
 	context.subscriptions.push(version_check);
 	context.subscriptions.push(discover_notes);
 	context.subscriptions.push(init_notter);

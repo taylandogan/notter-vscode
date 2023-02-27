@@ -8,7 +8,7 @@
     "notter",
     "task"
   ],
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "taylan",
   "homepage": "https://github.com/taylandogan/notter-vscode",
   "repository": {
@@ -46,10 +46,6 @@
     },
     "commands": [
       {
-        "command": "notter.gituser",
-        "title": "Notter: Git User Check"
-      },
-      {
         "command": "notter.version",
         "title": "Notter: Version Check"
       },
@@ -59,7 +55,7 @@
       },
       {
         "command": "notter.init",
-        "title": "Notter: Initiaze Notter Instance"
+        "title": "Notter: Initialize Notter Instance"
       }
     ],
     "configuration": {
@@ -69,6 +65,16 @@
           "type": "string",
           "default": "",
           "description": "The folder where the project source code is located"
+        },
+        "notter.username": {
+          "type": "string",
+          "default": "",
+          "description": "Username to be used for Notter"
+        },
+        "notter.email": {
+          "type": "string",
+          "default": "",
+          "description": "Email to be used for Notter"
         }
       }
     }
