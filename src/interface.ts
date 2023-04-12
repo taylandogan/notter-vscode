@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Comment } from './model';
 import { execShell } from "./utils";
+import { SRC_PATH_CONFIG_LABEL } from './constants';
 
 export const checkNotterVersion = async (): Promise<string|null> => {
 	try {
@@ -29,6 +30,7 @@ export const initNotter = async (username: string, email: string): Promise<[bool
 
 export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 	let noteDict = {};
+	const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
 
 	try {
 		const discoveredComments: string = await discoverNotes();
@@ -39,6 +41,11 @@ export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 		for (const comment of foundComments) {
 			// Skip non-TODO notes
 			if (comment.type !== "TODO") {
+				continue;
+			}
+
+			// This should never happen but skip todo if it does not include src path in filepath
+			if (!comment.filepath.includes(srcFolder)) {
 				continue;
 			}
 

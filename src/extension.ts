@@ -28,7 +28,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		console.log(selectedNote);
 		// Open the file and reveal the line containing the selected todo
 		const document = await vscode.workspace.openTextDocument(vscode.Uri.file(selectedNote.filepath));
 		const textEditor = await vscode.window.showTextDocument(document);
