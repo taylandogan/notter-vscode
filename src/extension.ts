@@ -1,15 +1,43 @@
 import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { configCheck } from './utils';
-import { checkNotterVersion, fetchNotes, initNotter } from './interface';
+import { checkNotterVersion, fetchTodos, initNotter } from './interface';
 import { SRC_PATH_CONFIG_LABEL, USERNAME_CONFIG_LABEL, EMAIL_CONFIG_LABEL } from './constants';
+import { Comment } from './model';
 
 
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "notter-vscode" is now active!');
-	let comments: {[key: string]: [number, string]} = {};
+	let comments: {[key: string]: Comment[]} = {};
 	const noteProvider = new NoteProvider(comments);
-	vscode.window.registerTreeDataProvider('notter', noteProvider);
+	vscode.window.registerTreeDataProvider('notterTreeView', noteProvider);
+
+	const notterTreeView = vscode.window.createTreeView('notterTreeView', {
+		treeDataProvider: noteProvider
+	});
+
+	// Register the onDidChangeSelection event handler
+	notterTreeView.onDidChangeSelection(async (note) => {
+		if (!note.selection || note.selection.length === 0) {
+		  return;
+		}
+
+		const selectedNote = note.selection[0];
+		// Do not do anything if the selected item has a child
+		if (selectedNote.children !== undefined || selectedNote.filepath === undefined || selectedNote.line === undefined) {
+			return;
+		}
+
+		console.log(selectedNote);
+		// Open the file and reveal the line containing the selected todo
+		const document = await vscode.workspace.openTextDocument(vscode.Uri.file(selectedNote.filepath));
+		const textEditor = await vscode.window.showTextDocument(document);
+
+		// vscode.Position is zero-indexed, so (selectedNote.line - 1)
+		const position = new vscode.Position(selectedNote.line - 1, 0);
+		textEditor.selection = new vscode.Selection(position, position);
+		textEditor.revealRange(new vscode.Range(position, position));
+	  });
 
 	let version_check = vscode.commands.registerCommand('notter.version', async () => {
 		try {
@@ -45,7 +73,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		try {
 			if (!configCheck(SRC_PATH_CONFIG_LABEL)) { return; }
 
-			comments = await fetchNotes();
+			comments = await fetchTodos();
 			noteProvider.refresh(comments);
 			vscode.window.showInformationMessage(`Notes updated`, { modal: false });
 		} catch(err) {
@@ -56,6 +84,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(version_check);
 	context.subscriptions.push(discover_notes);
 	context.subscriptions.push(init_notter);
+	context.subscriptions.push(notterTreeView);
 }
 
 export function deactivate() {}

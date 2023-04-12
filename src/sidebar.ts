@@ -1,12 +1,19 @@
 import * as vscode from 'vscode';
+import { Comment } from './model';
 
 
 class FileTreeItem extends vscode.TreeItem {
 	children: FileTreeItem[]|undefined;
+	filepath: string;
+	line: number;
+	type: string;
 
-	constructor(label: string, children?: FileTreeItem[]) {
+	constructor(label: string, children?: FileTreeItem[], filepath?: string, line?: number, type?: string) {
 	  super(label, children === undefined ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed);
 	  this.children = children;
+	  this.filepath = filepath;
+	  this.line = line;
+	  this.type = type;
 	}
   }
 
@@ -17,16 +24,17 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 
 	data: FileTreeItem[];
 
-	constructor(comments: {[key: string]: [number, string]}) {
+	constructor(comments: {[key: string]: Comment[]}) {
 		this.data = this.buildTree(comments);
 	}
 
-	buildTree(comments: {[key: string]: [number, string]}): FileTreeItem[] {
+	buildTree(comments: {[key: string]: Comment[]}): FileTreeItem[] {
 		let data: FileTreeItem[] = [];
 
 		for (const [filepath, notes] of Object.entries(comments)) {
-			let noteItems = notes.map((note) => {
-				return new FileTreeItem(`${note[0]}: ${note[1]}`);
+			let noteItems: FileTreeItem[] = notes.map((note) => {
+
+				return new FileTreeItem(`${note.line}: ${note.text}`, undefined, note.filepath, note.line, note.type);
 			});
 
 			data.push(new FileTreeItem(filepath, noteItems));
@@ -35,7 +43,7 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 		return data;
 	}
 
-	refresh(comments: {[key: string]: [number, string]}): void {
+	refresh(comments: {[key: string]: Comment[]}): void {
 		this.data = this.buildTree(comments);
 		this._onDidChangeTreeData.fire();
 	}

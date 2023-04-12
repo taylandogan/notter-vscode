@@ -27,7 +27,7 @@ export const initNotter = async (username: string, email: string): Promise<[bool
     }
 }
 
-export const fetchNotes = async (): Promise<{[key: string]: [number, string]}> => {
+export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 	let noteDict = {};
 
 	try {
@@ -37,10 +37,15 @@ export const fetchNotes = async (): Promise<{[key: string]: [number, string]}> =
 		});
 
 		for (const comment of foundComments) {
+			// Skip non-TODO notes
+			if (comment.type !== "TODO") {
+				continue;
+			}
+
 			if (comment.filepath in noteDict) {
-				noteDict[comment.filepath].push([comment.line, comment.text]);
+				noteDict[comment.filepath].push(comment);
 			} else {
-				noteDict[comment.filepath] = [[comment.line, comment.text]];
+				noteDict[comment.filepath] = [comment];
 			}
 		}
 	} catch (err) {

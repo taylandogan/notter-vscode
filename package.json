@@ -39,7 +39,7 @@
     "views": {
       "notter-explorer": [
         {
-          "id": "notter",
+          "id": "notterTreeView",
           "name": "Discovered Comments"
         }
       ]
