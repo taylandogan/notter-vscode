@@ -100,12 +100,13 @@
 
     function getTextContent(noteTreeNode) {
         let textContent = "";
-        if (noteTreeNode.hasOwnProperty("children") && noteTreeNode.hasOwnProperty("filepath")) {
-            const parts = noteTreeNode.filepath.split(/[/\\]/); // Split on both / and \
+        if (noteTreeNode.hasOwnProperty("children")) {
+            const parts = noteTreeNode.label.split(/[/\\]/); // Split on both / and \
             const fileName = parts.pop();
-            const pathStr = parts.pop();
+            // const pathStr = parts.pop();
 
-            textContent = `<strong>${fileName}</strong> - ${pathStr}`;
+            // TODO: Find a way to make filename bold, and display path starting from working dir
+            textContent = fileName;
         } else {
             textContent = noteTreeNode.label;
         }
