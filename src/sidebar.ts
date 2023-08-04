@@ -22,8 +22,8 @@ class FileTreeItem extends vscode.TreeItem {
 export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 	private _onDidChangeTreeData: vscode.EventEmitter<FileTreeItem | undefined | null | void> = new vscode.EventEmitter<FileTreeItem | undefined | null | void>();
 	readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
-	srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
 
+	srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
 	data: FileTreeItem[];
 
 	constructor(comments: {[key: string]: Comment[]}) {

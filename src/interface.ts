@@ -3,6 +3,15 @@ import { Comment } from './model';
 import { execShell } from "./utils";
 import { SRC_PATH_CONFIG_LABEL } from './constants';
 
+export const initNotter = async (username: string, email: string): Promise<[boolean, string]> => {
+	try {
+		let output = await execShell(`notter --init ${username} ${email}`);
+		return [true, "Notter instance initialized properly"];
+	} catch (err) {
+		return [false, err];
+	}
+}
+
 export const checkNotterVersion = async (): Promise<string|null> => {
 	try {
 		return await execShell('notter --version');
@@ -19,14 +28,6 @@ export const discoverNotes = async (): Promise<string> => {
     }
 }
 
-export const initNotter = async (username: string, email: string): Promise<[boolean, string]> => {
-    try {
-        let output = await execShell(`notter --init ${username} ${email}`);
-        return [true, "Notter instance initialized properly"];
-    } catch (err) {
-        return [false, err];
-    }
-}
 
 export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 	let noteDict = {};
