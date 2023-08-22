@@ -17,6 +17,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.window.registerWebviewViewProvider('notterTreeView', noteWebViewProvider)
 	)
 
+	// Call discover command whenever a file saved to keep Notter up to date
+	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
+		await vscode.commands.executeCommand('notter.discover');
+	}));
+
 	// --- COMMANDS ---
 	let version_check = vscode.commands.registerCommand('notter.version', async () => {
 		try {
@@ -54,7 +59,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			comments = await fetchTodos();
 			noteProvider.refresh(comments);
-			vscode.window.showInformationMessage(`Notes updated`, { modal: false });
 		} catch(err) {
 			vscode.window.showErrorMessage("Error while discovering notes: " + err);
 		}
