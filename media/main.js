@@ -38,8 +38,14 @@
     updateTreeView(notes);
 
     // --- FUNCTIONS ---
+    function clearTreeView() {
+        while (treeView.firstChild) {
+            treeView.removeChild(treeView.firstChild);
+        }
+    }
+
     function updateTreeView(notes) {
-        console.log("UPDATE TREE VIEW CALLED: ", notes)
+        clearTreeView();
         notes.forEach(fileNoteRoot => treeView.appendChild(buildFileNoteTree(fileNoteRoot)));
         vscode.setState({ notes: notes });
     }
