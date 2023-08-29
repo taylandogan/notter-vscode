@@ -71,16 +71,19 @@
         "notter.projectSourceFolder": {
           "type": "string",
           "default": "",
+          "scope": "resource",
           "description": "The folder where the project source code is located"
         },
         "notter.username": {
           "type": "string",
           "default": "",
+          "scope": "application",
           "description": "Username to be used for Notter"
         },
         "notter.email": {
           "type": "string",
           "default": "",
+          "scope": "application",
           "description": "Email to be used for Notter"
         }
       }

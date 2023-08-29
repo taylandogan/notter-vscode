@@ -23,11 +23,39 @@ new Promise<string>((resolve, reject) => {
 	});
 });
 
-export const configCheck = (label: string) => {
-	let configValue = vscode.workspace.getConfiguration('notter').get(label);
+export const getCurrentWorkingDirectory = () => {
+	if (vscode.workspace.workspaceFolders) {
+		return vscode.workspace.workspaceFolders[0].uri.fsPath;
+	} else {
+		// Handle the case when there is no open workspace
+		return null;
+	}
+}
+
+export const getNotterConfiguration = () => {
+	return vscode.workspace.getConfiguration('notter');
+}
+
+export const setNotterConfiguration = async (label: string, value: any) => {
+	const config = getNotterConfiguration();
+	await config.update(label, value, vscode.ConfigurationTarget.Workspace);
+}
+
+export const isConfigured = (label: string) => {
+	let config = getNotterConfiguration();
+	let configValue = config.get(label);
 	if (!configValue) {
-		vscode.window.showErrorMessage(`Please set ${label} configuration for Notter to work properly`);
 		return false;
 	}
 	return true;
+}
+
+export const setWorkingDirectory = async () => {
+	if (!isConfigured(SRC_PATH_CONFIG_LABEL)) {
+		const currentWorkingDirectory = getCurrentWorkingDirectory();
+
+		if (currentWorkingDirectory) {
+			await setNotterConfiguration(SRC_PATH_CONFIG_LABEL, currentWorkingDirectory)
+		}
+	}
 }
