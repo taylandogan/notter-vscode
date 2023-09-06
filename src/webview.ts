@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
+import {notterReadyEventEmitter} from './extension';
 
 export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 
@@ -18,7 +19,13 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 			localResourceRoots: [this._extensionUri]
 		};
 
-		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+		// Initially display a Loading.. message
+		webviewView.webview.html = this._getLoadingHtml();
+
+		// Update the view once the plugin is ready
+		notterReadyEventEmitter.on('initialized', () => {
+			webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+		});
 
         // Post message to WebView content to keep it up to date
         this._noteProvider.onDidChangeTreeData(() => {
@@ -50,6 +57,30 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 			null,
 			this._disposables
 		);
+	}
+
+	private _getLoadingHtml() {
+		return `
+			<!DOCTYPE html>
+			<html lang="en">
+			<head>
+			<meta charset="UTF-8">
+			<title>Loading</title>
+			<style>
+				body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+				}
+			</style>
+			</head>
+			<body>
+			<div>Loading...</div>
+			</body>
+			</html>
+		`;
 	}
 
     private _getHtmlForWebview(webview: vscode.Webview) {

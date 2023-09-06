@@ -5,7 +5,9 @@ import { checkNotterVersion, fetchTodos, initNotter } from './interface';
 import { SRC_PATH_CONFIG_LABEL, USERNAME_CONFIG_LABEL, EMAIL_CONFIG_LABEL } from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
+import { EventEmitter } from 'stream';
 
+export const notterReadyEventEmitter = new EventEmitter();
 
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('"notter-vscode" is now active!');
@@ -78,17 +80,17 @@ export async function activate(context: vscode.ExtensionContext) {
 					progress.report({ message: 'Discovering comments/notes...' });
 					await vscode.commands.executeCommand('notter.discover');
 				}
-		});
+				notterReadyEventEmitter.emit('initialized');
+			});
 	}
 
 	// --- INIT PLUGIN ---
+	await initNotterInWorkspace();	// Initialize and discover notes
 
 	// Create the tree view
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider('notterTreeView', noteWebViewProvider)
 	);
-
-	await initNotterInWorkspace();	// Initialize and discover notes
 
 	// Add trigger for discover command whenever a file saved to keep Notter up to date
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
