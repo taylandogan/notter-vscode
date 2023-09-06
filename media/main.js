@@ -68,7 +68,7 @@
             // TODO: Integrate a source for file icons and fetch it here
             // const fileIcon = getFileIcon(fileNoteRoot);
             iconSpan.classList.add("node-icon", "codicon", "codicon-file");
-            chevronIconSpan.classList.add("node-icon", "codicon", "codicon-chevron-right");
+            chevronIconSpan.classList.add("node-icon", "codicon", "chevron-icon", "codicon-chevron-right");
 
             fileNoteRoot.children.forEach(childNode => ul.appendChild(buildFileNoteTree(childNode)));
             li.appendChild(ul);
@@ -88,7 +88,7 @@
         } else {
             li.classList.add("child-node");
             // TODO: Add an icon for how critical the note is, use iconSpan
-            chevronIconSpan.classList.add("node-icon", "codicon");
+            chevronIconSpan.classList.add("node-icon", "codicon", "chevron-icon");
             chevronIconSpan.style.display = 'none'; // Hide the placeholder span
 
             li.onclick = function(event) {
@@ -156,23 +156,21 @@
     // --- EVENTS ---
     // Handle click event for parent collapse/expand
     document.querySelectorAll(".parent-node").forEach(parentNode => {
+        const chevronIcon = parentNode.querySelector(".chevron-icon");
+        const childrenContainer = parentNode.querySelector(".child-node")?.closest("ul");
+
         parentNode.addEventListener("click", (event) => {
             event.stopPropagation(); // prevent event from bubbling up to parent nodes
             if (event.target !== parentNode) {
                 return;
             }
 
-            const icon = parentNode.querySelector(".node-icon");
-            const children = parentNode.querySelector(".child-node");
-
-            if (parentNode.classList.contains("collapsed")) {
-                parentNode.classList.remove("collapsed");
-                icon.classList.replace("codicon-chevron-right", "codicon-chevron-down");
-                children.style.display = ""; // show children
+            if (childrenContainer.style.display == "none") {
+                chevronIcon.classList.replace("codicon-chevron-right", "codicon-chevron-down");
+                childrenContainer.style.display = ""; // show children
             } else {
-                parentNode.classList.add("collapsed");
-                icon.classList.replace("codicon-chevron-down", "codicon-chevron-right");
-                children.style.display = "none"; // hide children
+                chevronIcon.classList.replace("codicon-chevron-down", "codicon-chevron-right");
+                childrenContainer.style.display = "none"; // hide children
             }
         });
     });
