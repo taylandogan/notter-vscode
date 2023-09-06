@@ -162,7 +162,6 @@
                 return;
             }
 
-            console.log("COLLAPSE: ", parentNode)
             const icon = parentNode.querySelector(".node-icon");
             const children = parentNode.querySelector(".child-node");
 

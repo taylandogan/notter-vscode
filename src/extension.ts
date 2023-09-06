@@ -8,7 +8,7 @@ import { NoteWebViewProvider } from './webview';
 
 
 export async function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "notter-vscode" is now active!');
+	console.log('"notter-vscode" is now active!');
 	let comments: {[key: string]: Comment[]} = {};
 	const noteProvider = new NoteProvider(comments);
 	const noteWebViewProvider = new NoteWebViewProvider(context.extensionUri,  noteProvider);
@@ -48,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	let discoverNotesCommand = vscode.commands.registerCommand('notter.discover', async () => {
 		try {
 			if (!isConfigured(SRC_PATH_CONFIG_LABEL)) {
-				vscode.window.showErrorMessage(`Please set '${SRC_PATH_CONFIG_LABEL}' configuration for Notter to work properly`);
+				console.log(`Please set '${SRC_PATH_CONFIG_LABEL}' configuration for Notter to work properly`);
 				return;
 			}
 
@@ -86,14 +86,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Create the tree view
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider('notterTreeView', noteWebViewProvider)
-		);
-
-		// Add trigger for discover command whenever a file saved to keep Notter up to date
-		context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
-			await vscode.commands.executeCommand('notter.discover');
-		}));
+	);
 
 	await initNotterInWorkspace();	// Initialize and discover notes
+
+	// Add trigger for discover command whenever a file saved to keep Notter up to date
+	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
+		await vscode.commands.executeCommand('notter.discover');
+	}));
+
 }
 
 export function deactivate() {}
