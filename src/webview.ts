@@ -58,7 +58,7 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 
 		// Do the same for the stylesheet.
 		const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css'));
-        const codiconUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'));
+        const codiconUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'codicons', 'codicon.css'));
 
         // Use a nonce to only allow a specific script to be run.
 		const nonce = getNonce();
