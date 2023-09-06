@@ -89,7 +89,7 @@
             li.classList.add("child-node");
             // TODO: Add an icon for how critical the note is, use iconSpan
             chevronIconSpan.classList.add("node-icon", "codicon");
-            chevronIconSpan.style.visibility = 'hidden'; // Hide the placeholder span
+            chevronIconSpan.style.display = 'none'; // Hide the placeholder span
 
             li.onclick = function(event) {
                 event.stopPropagation(); // Stop the click event from bubbling up to the parent
@@ -165,6 +165,7 @@
             console.log("COLLAPSE: ", parentNode)
             const icon = parentNode.querySelector(".node-icon");
             const children = parentNode.querySelector(".child-node");
+
             if (parentNode.classList.contains("collapsed")) {
                 parentNode.classList.remove("collapsed");
                 icon.classList.replace("codicon-chevron-right", "codicon-chevron-down");
@@ -185,6 +186,9 @@
         let childNodes = document.querySelectorAll('.child-node');
 
         childNodes.forEach(function(node) {
+            // Reset display before actually determining if the node should be visible
+            node.style.display = '';
+
             // convert to lower case for case insensitive search
             let nodeText = node.textContent.toLowerCase();
 
@@ -194,7 +198,9 @@
 
                 // also make sure to display its parent and siblings if found
                 let parent = node.closest('.parent-node');
-                if (parent) parent.style.display = '';
+                if (parent) {
+                    parent.style.display = '';
+                }
             } else {
                 node.style.display = 'none';
             }
@@ -203,6 +209,10 @@
         // for parent nodes that don't have any visible child nodes
         let parentNodes = document.querySelectorAll('.parent-node');
         parentNodes.forEach(function(node) {
+            // Reset display before actually determining if the node should be visible
+            node.style.display = '';
+
+            // Hide parents if all their children are hidden
             let childNodes = node.querySelectorAll('.child-node');
             let allChildrenHidden = Array.from(childNodes).every(childNode => childNode.style.display === 'none');
             if (allChildrenHidden) {
