@@ -3,27 +3,30 @@ import { Comment } from './model';
 import { execShell } from "./utils";
 import { SRC_PATH_CONFIG_LABEL } from './constants';
 
-export const initNotter = async (username: string, email: string): Promise<[boolean, string]> => {
+export const initNotter = async (srcFolder: string, username: string, email: string): Promise<[boolean, string]> => {
 	try {
-		let output = await execShell(`notter --init ${username} ${email}`);
+		let output = await execShell(`notter --init ${username} ${email} ${srcFolder}` );
 		return [true, "Notter instance initialized properly"];
 	} catch (err) {
+		console.debug(err);
 		return [false, err];
 	}
 }
 
-export const checkNotterVersion = async (): Promise<string|null> => {
+export const checkNotterVersion = async (srcFolder: string): Promise<string|null> => {
 	try {
-		return await execShell('notter --version');
+		return await execShell(`notter ${srcFolder} --version`);
 	} catch (err) {
+		console.debug(err);
 		return null;
 	}
 }
 
-export const discoverNotes = async (): Promise<string> => {
+export const discoverNotes = async (srcFolder: string): Promise<string> => {
     try {
-        return await execShell('notter discover');
+        return await execShell(`notter ${srcFolder} discover`);
     } catch (err) {
+		console.debug(err);
         return "[]";
     }
 }
@@ -34,7 +37,7 @@ export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 	const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
 
 	try {
-		const discoveredComments: string = await discoverNotes();
+		const discoveredComments: string = await discoverNotes(srcFolder);
 		const foundComments = JSON.parse(discoveredComments).map((comment: any) => {
 			return new Comment(comment.filepath, comment.text, comment.line, comment.type, comment.multiline);
 		});

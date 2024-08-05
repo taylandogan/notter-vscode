@@ -71,7 +71,7 @@
         "notter.projectSourceFolder": {
           "type": "string",
           "default": "",
-          "scope": "resource",
+          "scope": "workspace",
           "description": "The folder where the project source code is located"
         },
         "notter.username": {

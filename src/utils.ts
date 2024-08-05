@@ -24,17 +24,20 @@ new Promise<string>((resolve, reject) => {
 });
 
 export const getCurrentWorkingDirectory = () => {
-	if (vscode.workspace.workspaceFolders) {
-		return vscode.workspace.workspaceFolders[0].uri.fsPath;
-	} else {
-		// Handle the case when there is no open workspace
-		return null;
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (!workspaceFolders) {
+		throw new Error('No workspace folder is open');
 	}
+
+	const firstWorkspaceFolder = workspaceFolders[0];
+	const fullPath = firstWorkspaceFolder.uri.fsPath;
+	console.log(`Full path of the first workspace folder: ${fullPath}`);
+	return fullPath;
 }
 
-export const getNotterConfiguration = () => {
-	return vscode.workspace.getConfiguration('notter');
-}
+export const getNotterConfiguration = (): vscode.WorkspaceConfiguration => {
+    return vscode.workspace.getConfiguration('notter');
+};
 
 export const setNotterConfiguration = async (label: string, value: any) => {
 	const config = getNotterConfiguration();
@@ -43,6 +46,7 @@ export const setNotterConfiguration = async (label: string, value: any) => {
 
 export const isConfigured = (label: string) => {
 	let config = getNotterConfiguration();
+	console.debug(`Notter config: ${JSON.stringify(config)}`);
 	let configValue = config.get(label);
 	if (!configValue) {
 		return false;
@@ -50,12 +54,8 @@ export const isConfigured = (label: string) => {
 	return true;
 }
 
-export const setWorkingDirectory = async () => {
-	if (!isConfigured(SRC_PATH_CONFIG_LABEL)) {
-		const currentWorkingDirectory = getCurrentWorkingDirectory();
-
-		if (currentWorkingDirectory) {
-			await setNotterConfiguration(SRC_PATH_CONFIG_LABEL, currentWorkingDirectory)
-		}
-	}
+export const setWorkingDirectory = async (): Promise<string> => {
+	const currentWorkingDirectory = getCurrentWorkingDirectory();
+	await setNotterConfiguration(SRC_PATH_CONFIG_LABEL, currentWorkingDirectory)
+	return currentWorkingDirectory;
 }

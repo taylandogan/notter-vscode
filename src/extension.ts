@@ -5,20 +5,64 @@ import { checkNotterVersion, fetchTodos, initNotter } from './interface';
 import { SRC_PATH_CONFIG_LABEL, USERNAME_CONFIG_LABEL, EMAIL_CONFIG_LABEL } from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
-import { EventEmitter } from 'stream';
 
-export const notterReadyEventEmitter = new EventEmitter();
+async function initNotterInWorkspace () {
+	try {
+		const result = vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: 'Notter',
+			cancellable: true
+			}, async (progress, token) => {
+				token.onCancellationRequested(() => {
+					vscode.window.showInformationMessage(`Notter: User canceled the initialization`);
+				});
+
+				// Set working directory
+				try{
+					progress.report({ message: 'Setting working directory...' });
+					const currentWorkingDirectory = await setWorkingDirectory();
+					console.log(`Notter: Set working directory to: ${currentWorkingDirectory}`);
+				} catch (error) {
+					console.log(`Could not initialize Notter: ${error}`);
+					return false;
+				}
+
+				// Initialize Notter instance
+				progress.report({ message: 'Initializing Notter...' });
+				let initialized = await vscode.commands.executeCommand('notter.init');
+				if (!initialized) {
+					console.log(`Could not initialize Notter`);
+					return false;
+				}
+
+				// Trigger comment discovery
+				progress.report({ message: 'Discovering comments/notes...' });
+				await vscode.commands.executeCommand('notter.discover');
+				return true;
+			});
+
+		return result;
+	} catch (error) {
+		vscode.window.showErrorMessage(`Error while initializing notter: ${error}`);
+		return false;
+	}
+}
 
 export async function activate(context: vscode.ExtensionContext) {
-	console.log('"notter-vscode" is now active!');
 	let comments: {[key: string]: Comment[]} = {};
 	const noteProvider = new NoteProvider(comments);
 	const noteWebViewProvider = new NoteWebViewProvider(context.extensionUri,  noteProvider);
 
 	// --- COMMANDS ---
 	let versionCheckCommand = vscode.commands.registerCommand('notter.version', async () => {
+		if (!isConfigured(SRC_PATH_CONFIG_LABEL) ) {
+			vscode.window.showErrorMessage(`Please set Notter configurations for Notter to work properly`);
+			return;
+		}
+
 		try {
-			let version = await checkNotterVersion();
+			const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
+			let version = await checkNotterVersion(srcFolder);
 			vscode.window.showInformationMessage(`You are using Notter ${version}`, { modal: false });
 		} catch(err) {
 			vscode.window.showErrorMessage("Please make sure that notter is installed and available in your PATH: " + err);
@@ -35,7 +79,14 @@ export async function activate(context: vscode.ExtensionContext) {
 			// TODO: Add a check for the username and email format they should not include a space
 			const username: string = vscode.workspace.getConfiguration('notter').get<string>(USERNAME_CONFIG_LABEL);
 			const email: string = vscode.workspace.getConfiguration('notter').get<string>(EMAIL_CONFIG_LABEL);
-			const [initialized, message]: [boolean, string] = await initNotter(username, email);
+			const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
+			console.debug(`Username set for Notter: ${username}`);
+			console.debug(`Email set for Notter: ${email}`);
+			console.debug(`Source path set for Notter: ${srcFolder}`);
+
+			const [initialized, message]: [boolean, string] = await initNotter(srcFolder, username, email);
+			console.debug(`Initialized: ${initialized}`);
+			console.debug(`Message: ${message}`);
 
 			if (!initialized) {
 				vscode.window.showErrorMessage(`Notter could not be initialized: ${message}`);
@@ -64,39 +115,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(versionCheckCommand);
 	context.subscriptions.push(discoverNotesCommand);
 	context.subscriptions.push(initNotterCommand);
-
-	// --- FUNCTIONS ---
-	let initNotterInWorkspace = async () => {
-		vscode.window.withProgress({
-			location: vscode.ProgressLocation.Notification,
-			title: 'Notter',
-			cancellable: false
-			}, async (progress) => {
-				progress.report({ message: 'Setting working directory...' });
-				await setWorkingDirectory();
-				progress.report({ message: 'Initializing Notter...' });
-				let initialized = await vscode.commands.executeCommand('notter.init');
-				if (initialized) {
-					progress.report({ message: 'Discovering comments/notes...' });
-					await vscode.commands.executeCommand('notter.discover');
-				}
-				notterReadyEventEmitter.emit('initialized');
-			});
-	}
-
-	// --- INIT PLUGIN ---
-	await initNotterInWorkspace();	// Initialize and discover notes
-
 	// Create the tree view
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider('notterTreeView', noteWebViewProvider)
 	);
-
 	// Add trigger for discover command whenever a file saved to keep Notter up to date
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
 		await vscode.commands.executeCommand('notter.discover');
 	}));
 
+	// --- INIT PLUGIN ---
+	await initNotterInWorkspace();	// Initialize and discover notes
 }
 
 export function deactivate() {}
