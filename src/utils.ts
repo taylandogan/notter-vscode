@@ -54,8 +54,7 @@ export const isConfigured = (label: string) => {
 	return true;
 }
 
-export const setWorkingDirectory = async (): Promise<string> => {
-	const currentWorkingDirectory = getCurrentWorkingDirectory();
-	await setNotterConfiguration(SRC_PATH_CONFIG_LABEL, currentWorkingDirectory)
-	return currentWorkingDirectory;
+export const setWorkingDirectory = async (sourceDirectory: string): Promise<string> => {
+	await setNotterConfiguration(SRC_PATH_CONFIG_LABEL, sourceDirectory)
+	return sourceDirectory;
 }

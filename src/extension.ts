@@ -20,10 +20,21 @@ async function initNotterInWorkspace () {
 				// Set working directory
 				try{
 					progress.report({ message: 'Setting working directory...' });
-					const currentWorkingDirectory = await setWorkingDirectory();
-					console.log(`Notter: Set working directory to: ${currentWorkingDirectory}`);
+					const sourceDirectory = await vscode.window.showInputBox({
+						placeHolder: 'Full path to src directory',
+						ignoreFocusOut: true,
+						prompt: 'Please set your source directory',
+						title: 'Notter > Set source directory'
+					});
+
+					if (sourceDirectory !== undefined) {
+						await setWorkingDirectory(sourceDirectory);
+					} else {
+						throw new Error('Please set the source directory in VSCode Workspace Settings for Notter (not via User Settings).')
+					}
+					vscode.window.showInformationMessage(`Notter: Set working directory to: ${sourceDirectory}`);
 				} catch (error) {
-					console.log(`Could not initialize Notter: ${error}`);
+					vscode.window.showErrorMessage(`Could not initialize Notter: ${error}`);
 					return false;
 				}
 
@@ -31,7 +42,7 @@ async function initNotterInWorkspace () {
 				progress.report({ message: 'Initializing Notter...' });
 				let initialized = await vscode.commands.executeCommand('notter.init');
 				if (!initialized) {
-					console.log(`Could not initialize Notter`);
+					vscode.window.showErrorMessage(`Could not initialize Notter: init command failed`);
 					return false;
 				}
 
@@ -92,6 +103,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				vscode.window.showErrorMessage(`Notter could not be initialized: ${message}`);
 			}
 
+			vscode.window.showInformationMessage(`Notter instance initialized on folder: ${srcFolder}`);
 			return initialized;
 		} catch(err) {
 			vscode.window.showErrorMessage("Error while initializing notter: " + err);
@@ -101,7 +113,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	let discoverNotesCommand = vscode.commands.registerCommand('notter.discover', async () => {
 		try {
 			if (!isConfigured(SRC_PATH_CONFIG_LABEL)) {
-				console.log(`Please set '${SRC_PATH_CONFIG_LABEL}' configuration for Notter to work properly`);
+				vscode.window.showErrorMessage(`Please set ' Project Source Folder' configuration in Workspace Settings for Notter to work properly`);
 				return;
 			}
 
@@ -125,7 +137,11 @@ export async function activate(context: vscode.ExtensionContext) {
 	}));
 
 	// --- INIT PLUGIN ---
-	await initNotterInWorkspace();	// Initialize and discover notes
+	try {
+		await initNotterInWorkspace();	// Initialize and discover notes
+	} catch (err) {
+		noteProvider.refresh({});
+	}
 }
 
 export function deactivate() {}
