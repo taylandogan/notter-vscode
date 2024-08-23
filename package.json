@@ -2,6 +2,7 @@
   "name": "notter-vscode",
   "displayName": "Notter",
   "description": "VSCode plugin for Notter",
+  "icon": "media/notter.png",
   "keyword": [
     "todo",
     "comment",
