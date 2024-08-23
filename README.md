@@ -1,3 +1,7 @@
+<div align="center">
+    <img src="media/notter.png" alt="logo" width="200"/>
+</div>
+
 # Notter
 
 Notter is a VSCode plugin that helps you manage TODOs within your codebase.
