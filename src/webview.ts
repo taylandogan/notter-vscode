@@ -30,6 +30,12 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
             });
         });
 
+		this._noteProvider.onDidClearSearchInput(() => {
+			webviewView.webview.postMessage({
+                type: "clearSearchInput"
+            });
+		});
+
 		// Listen for go to location events
 		webviewView.webview.onDidReceiveMessage(
 			async (message) => {

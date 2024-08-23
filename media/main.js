@@ -178,6 +178,15 @@
         return fileIconMappings[fileType] || "codicon-file";
     }
 
+    function clearSearchInput() {
+        let previousValue = searchInput.value;
+        searchInput.value = "";
+
+        if (previousValue) {
+            updateTreeView(notes);
+        }
+    }
+
     // --- EVENTS ---
     // Handle click event for parent collapse/expand
     document.querySelectorAll(".parent-node").forEach(parentNode => {
@@ -248,11 +257,14 @@
     window.addEventListener("message", event => {
         const message = event.data; // The json data that the extension sent
         switch (message.type) {
-            case "updateNotes":
-                {
-                    updateTreeView(message.notes, message.expandTree);
-                    break;
-                }
+            case "updateNotes": {
+                updateTreeView(message.notes, message.expandTree);
+                break;
+            }
+            case "clearSearchInput": {
+                clearSearchInput();
+                break;
+            }
         }
     });
 }());

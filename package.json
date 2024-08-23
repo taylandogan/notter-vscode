@@ -9,7 +9,7 @@
     "notter",
     "task"
   ],
-  "version": "0.3.8",
+  "version": "0.3.9",
   "publisher": "taylan",
   "homepage": "https://github.com/taylandogan/notter-vscode",
   "repository": {
@@ -47,7 +47,18 @@
       ]
     },
     "menus": {
+      "commandPalette": [
+        {
+          "command": "notter.clearSearchInput",
+          "when": "false"
+        }
+      ],
       "view/title": [
+        {
+          "command": "notter.clearSearchInput",
+          "when": "view =~ /notter/",
+          "group": "navigation@7"
+        },
         {
           "command": "notter.expand",
           "when": "view =~ /notter/",
@@ -81,6 +92,12 @@
         "command": "notter.init",
         "title": "Initialize Notter Instance",
         "category": "Notter"
+      },
+      {
+        "command": "notter.clearSearchInput",
+        "title": "Clear TODO search input",
+        "category": "Notter",
+        "icon": "$(clear-all)"
       },
       {
         "command": "notter.expand",

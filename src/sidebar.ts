@@ -23,6 +23,9 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 	private _onDidChangeTreeData: vscode.EventEmitter<FileTreeItem | undefined | null | void> = new vscode.EventEmitter<FileTreeItem | undefined | null | void>();
 	readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
+	private _onDidClearSearchInput: vscode.EventEmitter< undefined | null | void > = new vscode.EventEmitter<undefined | null | void>();
+	readonly onDidClearSearchInput: vscode.Event< undefined | null | void> = this._onDidClearSearchInput.event;
+
 	srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
 	data: FileTreeItem[];
 	expandTree: boolean;
@@ -50,6 +53,10 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 		this.data = this.buildTree(comments);
 		this.expandTree = expandTree;
 		this._onDidChangeTreeData.fire();
+	}
+
+	clearSearchInputField() : void {
+		this._onDidClearSearchInput.fire()
 	}
 
 	getTreeItem(element: FileTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {

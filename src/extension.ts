@@ -126,6 +126,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	let clearSearchInputCommand = vscode.commands.registerCommand('notter.clearSearchInput', async () => {
+		noteProvider.clearSearchInputField();
+	});
+
 	let expandTodoTreeCommand = vscode.commands.registerCommand('notter.expand', async () => {
 		noteProvider.refresh(context.workspaceState.get(CONTEXT_DISCOVERED_COMMENTS), true);
 	});
@@ -137,6 +141,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(versionCheckCommand);
 	context.subscriptions.push(discoverNotesCommand);
 	context.subscriptions.push(initNotterCommand);
+	context.subscriptions.push(clearSearchInputCommand);
 	context.subscriptions.push(expandTodoTreeCommand);
 	context.subscriptions.push(collapseTodoTreeCommand);
 
