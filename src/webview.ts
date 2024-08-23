@@ -23,10 +23,10 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 
         // Post message to WebView content to keep it up to date
         this._noteProvider.onDidChangeTreeData(() => {
-            let data = this._noteProvider.data;
             webviewView.webview.postMessage({
                 type: "updateNotes",
-                notes: data
+                notes: this._noteProvider.data,
+				expandTree: this._noteProvider.expandTree,
             });
         });
 

@@ -38,15 +38,40 @@
     updateTreeView(notes);
 
     // --- FUNCTIONS ---
+    function collapseAllNodes() {
+        treeView.querySelectorAll(".parent-node").forEach(parentNode => {
+            const chevronIcon = parentNode.querySelector(".chevron-icon");
+            const childrenContainer = parentNode.querySelector(".child-node")?.closest("ul");
+
+            chevronIcon.classList.replace("codicon-chevron-down", "codicon-chevron-right");
+            childrenContainer.style.display = "none"; // hide children
+        });
+    }
+
+    function expandAllNodes() {
+        treeView.querySelectorAll(".parent-node").forEach(parentNode => {
+            const chevronIcon = parentNode.querySelector(".chevron-icon");
+            const childrenContainer = parentNode.querySelector(".child-node")?.closest("ul");
+
+            chevronIcon.classList.replace("codicon-chevron-right", "codicon-chevron-down");
+            childrenContainer.style.display = ""; // show children
+        });
+    }
+
     function clearTreeView() {
         while (treeView.firstChild) {
             treeView.removeChild(treeView.firstChild);
         }
     }
 
-    function updateTreeView(notes) {
+    function updateTreeView(notes, expandTree) {
         clearTreeView();
         notes.forEach(fileNoteRoot => treeView.appendChild(buildFileNoteTree(fileNoteRoot)));
+        if (expandTree == true) {
+            expandAllNodes();
+        } else {
+            collapseAllNodes();
+        }
         vscode.setState({ notes: notes });
     }
 
@@ -164,7 +189,6 @@
             if (event.target !== parentNode) {
                 return;
             }
-
             if (childrenContainer.style.display == "none") {
                 chevronIcon.classList.replace("codicon-chevron-right", "codicon-chevron-down");
                 childrenContainer.style.display = ""; // show children
@@ -226,7 +250,7 @@
         switch (message.type) {
             case "updateNotes":
                 {
-                    updateTreeView(message.notes);
+                    updateTreeView(message.notes, message.expandTree);
                     break;
                 }
         }

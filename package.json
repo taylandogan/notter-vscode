@@ -9,7 +9,7 @@
     "notter",
     "task"
   ],
-  "version": "0.3.7",
+  "version": "0.3.8",
   "publisher": "taylan",
   "homepage": "https://github.com/taylandogan/notter-vscode",
   "repository": {
@@ -46,6 +46,20 @@
         }
       ]
     },
+    "menus": {
+      "view/title": [
+        {
+          "command": "notter.expand",
+          "when": "view =~ /notter/",
+          "group": "navigation@8"
+        },
+        {
+          "command": "notter.collapse",
+          "when": "view =~ /notter/",
+          "group": "navigation@9"
+        }
+      ]
+    },
     "viewsWelcome": [
       {
         "view": "notter-explorer",
@@ -55,15 +69,30 @@
     "commands": [
       {
         "command": "notter.version",
-        "title": "Notter: Version Check"
+        "title": "Version Check",
+        "category": "Notter"
       },
       {
         "command": "notter.discover",
-        "title": "Notter: Discover Comments"
+        "title": "Discover Comments",
+        "category": "Notter"
       },
       {
         "command": "notter.init",
-        "title": "Notter: Initialize Notter Instance"
+        "title": "Initialize Notter Instance",
+        "category": "Notter"
+      },
+      {
+        "command": "notter.expand",
+        "title": "Expand TODO tree",
+        "category": "Notter",
+        "icon": "$(expand-all)"
+      },
+      {
+        "command": "notter.collapse",
+        "title": "Collapse TODO tree",
+        "category": "Notter",
+        "icon": "$(collapse-all)"
       }
     ],
     "configuration": {

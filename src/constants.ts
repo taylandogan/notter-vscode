@@ -1,3 +1,7 @@
-export const SRC_PATH_CONFIG_LABEL = "projectSourceFolder"
-export const USERNAME_CONFIG_LABEL = "username"
-export const EMAIL_CONFIG_LABEL = "email"
+// Config variables
+export const SRC_PATH_CONFIG = "projectSourceFolder"
+export const USERNAME_CONFIG = "username"
+export const EMAIL_CONFIG = "email"
+
+// Context variables
+export const CONTEXT_DISCOVERED_COMMENTS = "contextDiscoveredComments"

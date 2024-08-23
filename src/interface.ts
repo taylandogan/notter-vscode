@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Comment } from './model';
 import { execShell } from "./utils";
-import { SRC_PATH_CONFIG_LABEL } from './constants';
+import { SRC_PATH_CONFIG } from './constants';
 
 export const initNotter = async (srcFolder: string, username: string, email: string): Promise<[boolean, string]> => {
 	try {
@@ -34,7 +34,7 @@ export const discoverNotes = async (srcFolder: string): Promise<string> => {
 
 export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 	let noteDict = {};
-	const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
+	const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
 
 	try {
 		const discoveredComments: string = await discoverNotes(srcFolder);

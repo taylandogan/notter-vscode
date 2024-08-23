@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { isConfigured, setWorkingDirectory } from './utils';
 import { checkNotterVersion, fetchTodos, initNotter } from './interface';
-import { SRC_PATH_CONFIG_LABEL, USERNAME_CONFIG_LABEL, EMAIL_CONFIG_LABEL } from './constants';
+import { SRC_PATH_CONFIG, USERNAME_CONFIG, EMAIL_CONFIG, CONTEXT_DISCOVERED_COMMENTS } from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
 
@@ -66,13 +66,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// --- COMMANDS ---
 	let versionCheckCommand = vscode.commands.registerCommand('notter.version', async () => {
-		if (!isConfigured(SRC_PATH_CONFIG_LABEL) ) {
+		if (!isConfigured(SRC_PATH_CONFIG) ) {
 			vscode.window.showErrorMessage(`Please set Notter configurations for Notter to work properly`);
 			return;
 		}
 
 		try {
-			const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
+			const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
 			let version = await checkNotterVersion(srcFolder);
 			vscode.window.showInformationMessage(`You are using Notter ${version}`, { modal: false });
 		} catch(err) {
@@ -82,15 +82,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let initNotterCommand = vscode.commands.registerCommand('notter.init', async () => {
 		try {
-			if ( !isConfigured(USERNAME_CONFIG_LABEL) || !isConfigured(EMAIL_CONFIG_LABEL) || !isConfigured(SRC_PATH_CONFIG_LABEL) ) {
+			if ( !isConfigured(USERNAME_CONFIG) || !isConfigured(EMAIL_CONFIG) || !isConfigured(SRC_PATH_CONFIG) ) {
 				vscode.window.showErrorMessage(`Please set Notter configurations for Notter to work properly`);
 				return;
 			}
 
 			// TODO: Add a check for the username and email format they should not include a space
-			const username: string = vscode.workspace.getConfiguration('notter').get<string>(USERNAME_CONFIG_LABEL);
-			const email: string = vscode.workspace.getConfiguration('notter').get<string>(EMAIL_CONFIG_LABEL);
-			const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
+			const username: string = vscode.workspace.getConfiguration('notter').get<string>(USERNAME_CONFIG);
+			const email: string = vscode.workspace.getConfiguration('notter').get<string>(EMAIL_CONFIG);
+			const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
+
 			console.debug(`Username set for Notter: ${username}`);
 			console.debug(`Email set for Notter: ${email}`);
 			console.debug(`Source path set for Notter: ${srcFolder}`);
@@ -112,25 +113,38 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let discoverNotesCommand = vscode.commands.registerCommand('notter.discover', async () => {
 		try {
-			if (!isConfigured(SRC_PATH_CONFIG_LABEL)) {
+			if (!isConfigured(SRC_PATH_CONFIG)) {
 				vscode.window.showErrorMessage(`Please set ' Project Source Folder' configuration in Workspace Settings for Notter to work properly`);
 				return;
 			}
 
 			comments = await fetchTodos();
-			noteProvider.refresh(comments);
+			context.workspaceState.update(CONTEXT_DISCOVERED_COMMENTS, comments);
+			noteProvider.refresh(comments, false);
 		} catch(err) {
 			vscode.window.showErrorMessage("Error while discovering notes: " + err);
 		}
 	});
 
+	let expandTodoTreeCommand = vscode.commands.registerCommand('notter.expand', async () => {
+		noteProvider.refresh(context.workspaceState.get(CONTEXT_DISCOVERED_COMMENTS), true);
+	});
+
+	let collapseTodoTreeCommand = vscode.commands.registerCommand('notter.collapse', async () => {
+		noteProvider.refresh(context.workspaceState.get(CONTEXT_DISCOVERED_COMMENTS), false);
+	});
+
 	context.subscriptions.push(versionCheckCommand);
 	context.subscriptions.push(discoverNotesCommand);
 	context.subscriptions.push(initNotterCommand);
+	context.subscriptions.push(expandTodoTreeCommand);
+	context.subscriptions.push(collapseTodoTreeCommand);
+
 	// Create the tree view
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider('notterTreeView', noteWebViewProvider)
 	);
+
 	// Add trigger for discover command whenever a file saved to keep Notter up to date
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
 		await vscode.commands.executeCommand('notter.discover');
@@ -140,7 +154,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	try {
 		await initNotterInWorkspace();	// Initialize and discover notes
 	} catch (err) {
-		noteProvider.refresh({});
+		noteProvider.refresh({}, false);
 	}
 }
 

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Comment } from './model';
-import { SRC_PATH_CONFIG_LABEL } from './constants';
+import { SRC_PATH_CONFIG } from './constants';
 
 
 class FileTreeItem extends vscode.TreeItem {
@@ -23,8 +23,9 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 	private _onDidChangeTreeData: vscode.EventEmitter<FileTreeItem | undefined | null | void> = new vscode.EventEmitter<FileTreeItem | undefined | null | void>();
 	readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-	srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL);
+	srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
 	data: FileTreeItem[];
+	expandTree: boolean;
 
 	constructor(comments: {[key: string]: Comment[]}) {
 		this.data = this.buildTree(comments);
@@ -45,8 +46,9 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 		return data;
 	}
 
-	refresh(comments: {[key: string]: Comment[]}): void {
+	refresh(comments: {[key: string]: Comment[]}, expandTree: boolean): void {
 		this.data = this.buildTree(comments);
+		this.expandTree = expandTree;
 		this._onDidChangeTreeData.fire();
 	}
 

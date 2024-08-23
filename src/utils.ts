@@ -1,6 +1,6 @@
 import * as child_process from 'child_process';
 import * as vscode from 'vscode';
-import { SRC_PATH_CONFIG_LABEL } from './constants';
+import { SRC_PATH_CONFIG } from './constants';
 
 const path = require('path');
 const projectDirectory = path.dirname(path.resolve(__dirname));
@@ -8,7 +8,7 @@ const binDirectory = path.join(projectDirectory, 'bin');
 
 export const execShell = (cmd: string, withEnv: boolean = true) =>
 new Promise<string>((resolve, reject) => {
-	let injectedEnv = withEnv ? {"SRC_PATH": vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG_LABEL)} : {};
+	let injectedEnv = withEnv ? {"SRC_PATH": vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG)} : {};
 	let childProcess = child_process.exec(cmd, {cwd: `${binDirectory}`, env: injectedEnv}, (err, stdout, stderr) => {
 		if (err) {
 			childProcess.stderr.on('data', (data) => {
@@ -55,6 +55,6 @@ export const isConfigured = (label: string) => {
 }
 
 export const setWorkingDirectory = async (sourceDirectory: string): Promise<string> => {
-	await setNotterConfiguration(SRC_PATH_CONFIG_LABEL, sourceDirectory)
+	await setNotterConfiguration(SRC_PATH_CONFIG, sourceDirectory)
 	return sourceDirectory;
 }
