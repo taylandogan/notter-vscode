@@ -26,10 +26,10 @@ Currently, Notter is able to provide the following functionality:
 - Visualize TODOs in your codebase in a collapsable tree view
 - Jump into a TODO location by clicking on it on the tree view
 - Search TODOs by a keyword
+- Export all your TODOs into a .json file
 
 
 Soon it will provide more functionality such as:
-- Exporting all your TODOs
 - Assigning priorities to your TODOs
 - Setting a deadline for TODOs
 - Warning/reminding developers about the TODOs within X days of a deadline
