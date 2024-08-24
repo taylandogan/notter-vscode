@@ -65,3 +65,14 @@ export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 
 	return noteDict;
 }
+
+
+export const exportTodos = async (srcFolder: string): Promise<void> => {
+	try {
+        await execShell(`notter ${srcFolder} export`);
+		vscode.window.showInformationMessage(`Your TODOs have been exported to /.notter/todos.json file`, { modal: false });
+    } catch (err) {
+		console.debug(err);
+		vscode.window.showErrorMessage("Unexpected error occured while exporting the TODOs: " + err);
+    }
+}

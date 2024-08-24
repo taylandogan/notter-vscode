@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { isConfigured, setWorkingDirectory } from './utils';
-import { checkNotterVersion, fetchTodos, initNotter } from './interface';
+import { checkNotterVersion, exportTodos, fetchTodos, initNotter } from './interface';
 import { SRC_PATH_CONFIG, USERNAME_CONFIG, EMAIL_CONFIG, CONTEXT_DISCOVERED_COMMENTS } from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
@@ -138,12 +138,18 @@ export async function activate(context: vscode.ExtensionContext) {
 		noteProvider.refresh(context.workspaceState.get(CONTEXT_DISCOVERED_COMMENTS), false);
 	});
 
+	let exportCommand = vscode.commands.registerCommand('notter.export', async () => {
+		const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
+		await exportTodos(srcFolder);
+	});
+
 	context.subscriptions.push(versionCheckCommand);
 	context.subscriptions.push(discoverNotesCommand);
 	context.subscriptions.push(initNotterCommand);
 	context.subscriptions.push(clearSearchInputCommand);
 	context.subscriptions.push(expandTodoTreeCommand);
 	context.subscriptions.push(collapseTodoTreeCommand);
+	context.subscriptions.push(exportCommand);
 
 	// Create the tree view
 	context.subscriptions.push(
