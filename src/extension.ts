@@ -162,9 +162,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// --- INIT PLUGIN ---
 	try {
-		await initNotterInWorkspace();	// Initialize and discover notes
+		let result = await initNotterInWorkspace();	// Initialize and discover notes
+		if (result == true) {
+			noteProvider.triggerTreeUpdate();
+		} else {
+			noteProvider.refresh({}, false);
+		}
 	} catch (err) {
-		noteProvider.refresh({}, false);
+		vscode.window.showErrorMessage("Could not initialize Notter properly: " + err);
 	}
 }
 

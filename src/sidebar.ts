@@ -52,10 +52,14 @@ export class NoteProvider implements vscode.TreeDataProvider<FileTreeItem> {
 		return data;
 	}
 
+	triggerTreeUpdate(): void {
+		this._onDidChangeTreeData.fire();
+	}
+
 	refresh(comments: {[key: string]: Comment[]}, expandTree: boolean): void {
 		this.data = this.buildTree(comments);
 		this.expandTree = expandTree;
-		this._onDidChangeTreeData.fire();
+		this.triggerTreeUpdate();
 	}
 
 	collapse() : void {

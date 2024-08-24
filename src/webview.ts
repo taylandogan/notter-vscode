@@ -26,7 +26,6 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
             webviewView.webview.postMessage({
                 type: "updateNotes",
                 notes: this._noteProvider.data,
-				expandTree: this._noteProvider.expandTree,
             });
         });
 
