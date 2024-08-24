@@ -30,6 +30,13 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
             });
         });
 
+		this._noteProvider.onCollapseExpandButtonClicked(() => {
+			webviewView.webview.postMessage({
+				type: "collapseExpand",
+                expandTree: this._noteProvider.expandTree,
+            });
+		});
+
 		this._noteProvider.onDidClearSearchInput(() => {
 			webviewView.webview.postMessage({
                 type: "clearSearchInput"

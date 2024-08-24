@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { isConfigured, setWorkingDirectory } from './utils';
 import { checkNotterVersion, exportTodos, fetchTodos, initNotter } from './interface';
-import { SRC_PATH_CONFIG, USERNAME_CONFIG, EMAIL_CONFIG, CONTEXT_DISCOVERED_COMMENTS } from './constants';
+import { SRC_PATH_CONFIG, USERNAME_CONFIG, EMAIL_CONFIG } from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
 
@@ -119,7 +119,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			}
 
 			comments = await fetchTodos();
-			context.workspaceState.update(CONTEXT_DISCOVERED_COMMENTS, comments);
 			noteProvider.refresh(comments, false);
 		} catch(err) {
 			vscode.window.showErrorMessage("Error while discovering notes: " + err);
@@ -131,11 +130,11 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	let expandTodoTreeCommand = vscode.commands.registerCommand('notter.expand', async () => {
-		noteProvider.refresh(context.workspaceState.get(CONTEXT_DISCOVERED_COMMENTS), true);
+		noteProvider.expand();
 	});
 
 	let collapseTodoTreeCommand = vscode.commands.registerCommand('notter.collapse', async () => {
-		noteProvider.refresh(context.workspaceState.get(CONTEXT_DISCOVERED_COMMENTS), false);
+		noteProvider.collapse();
 	});
 
 	let exportCommand = vscode.commands.registerCommand('notter.export', async () => {

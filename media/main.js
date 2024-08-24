@@ -64,15 +64,18 @@
         }
     }
 
-    function updateTreeView(notes, expandTree) {
+    function updateTreeView(notes) {
         clearTreeView();
         notes.forEach(fileNoteRoot => treeView.appendChild(buildFileNoteTree(fileNoteRoot)));
+        vscode.setState({ notes: notes });
+    }
+
+    function collapseExpand(expandTree) {
         if (expandTree == true) {
             expandAllNodes();
         } else {
             collapseAllNodes();
         }
-        vscode.setState({ notes: notes });
     }
 
     function buildFileNoteTree(fileNoteRoot) {
@@ -258,7 +261,11 @@
         const message = event.data; // The json data that the extension sent
         switch (message.type) {
             case "updateNotes": {
-                updateTreeView(message.notes, message.expandTree);
+                updateTreeView(message.notes);
+                break;
+            }
+            case "collapseExpand": {
+                collapseExpand(message.expandTree);
                 break;
             }
             case "clearSearchInput": {
