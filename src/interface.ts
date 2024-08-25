@@ -15,7 +15,7 @@ export const initNotter = async (srcFolder: string, username: string, email: str
 
 export const checkNotterVersion = async (srcFolder: string): Promise<string|null> => {
 	try {
-		return await execShell(`notter ${srcFolder} --version`);
+		return await execShell(`notter --version ${srcFolder}`);
 	} catch (err) {
 		console.debug(err);
 		return null;
