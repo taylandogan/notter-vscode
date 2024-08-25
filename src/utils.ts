@@ -31,7 +31,6 @@ export const getCurrentWorkingDirectory = () => {
 
 	const firstWorkspaceFolder = workspaceFolders[0];
 	const fullPath = firstWorkspaceFolder.uri.fsPath;
-	console.log(`Full path of the first workspace folder: ${fullPath}`);
 	return fullPath;
 }
 

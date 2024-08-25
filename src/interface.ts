@@ -32,6 +32,16 @@ export const discoverNotes = async (srcFolder: string): Promise<string> => {
 }
 
 
+export const discoverNotesInFile = async (srcFolder: string, filepath: string): Promise<string> => {
+    try {
+        return await execShell(`notter ${srcFolder} discover-file ${filepath}`);
+    } catch (err) {
+		console.debug(err);
+        return "[]";
+    }
+}
+
+
 export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 	let noteDict = {};
 	const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
@@ -64,6 +74,21 @@ export const fetchTodos = async (): Promise<{[key: string]: Comment[]}> => {
 	}
 
 	return noteDict;
+}
+
+export const fetchTodosInFile = async (filepath: string): Promise<Comment[]> => {
+	const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
+
+	try {
+		const discoveredComments: string = await discoverNotesInFile(srcFolder, filepath);
+		const foundComments = JSON.parse(discoveredComments).map((comment: any) => {
+			return new Comment(comment.filepath, comment.text, comment.line, comment.type, comment.multiline);
+		});
+		return foundComments;
+	} catch (err) {
+		vscode.window.showErrorMessage("Error while fetching notes: " + err);
+	}
+	return [];
 }
 
 

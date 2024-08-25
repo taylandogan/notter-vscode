@@ -9,7 +9,7 @@
     "notter",
     "task"
   ],
-  "version": "0.3.14",
+  "version": "0.3.15",
   "publisher": "taylan",
   "homepage": "https://github.com/taylandogan/notter-vscode",
   "repository": {
@@ -51,6 +51,10 @@
         {
           "command": "notter.clearSearchInput",
           "when": "false"
+        },
+        {
+          "command": "notter.discoverFile",
+          "when": "false"
         }
       ],
       "view/title": [
@@ -91,6 +95,11 @@
       {
         "command": "notter.discover",
         "title": "Discover Comments",
+        "category": "Notter"
+      },
+      {
+        "command": "notter.discoverFile",
+        "title": "Discover Comments in a Single File",
         "category": "Notter"
       },
       {

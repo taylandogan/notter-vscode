@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { getCurrentWorkingDirectory, isConfigured, setWorkingDirectory } from './utils';
-import { checkNotterVersion, exportTodos, fetchTodos, initNotter } from './interface';
+import { checkNotterVersion, exportTodos, fetchTodos, fetchTodosInFile, initNotter } from './interface';
 import { SRC_PATH_CONFIG, USERNAME_CONFIG, EMAIL_CONFIG } from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
@@ -146,6 +146,25 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	let discoverNotesFileCommand = vscode.commands.registerCommand('notter.discoverFile', async (filepath: string) => {
+		try {
+			if (!isConfigured(SRC_PATH_CONFIG)) {
+				vscode.window.showErrorMessage(`Please set ' Project Source Folder' configuration in Workspace Settings for Notter to work properly`);
+				return;
+			}
+
+			let updatedComments = await fetchTodosInFile(filepath);
+			if (updatedComments.length == 0) {
+				delete comments[filepath];
+			} else {
+				comments[filepath] = updatedComments;
+			}
+			noteProvider.refresh(comments, false);
+		} catch(err) {
+			vscode.window.showErrorMessage("Error while discovering notes: " + err);
+		}
+	});
+
 	let clearSearchInputCommand = vscode.commands.registerCommand('notter.clearSearchInput', async () => {
 		noteProvider.clearSearchInputField();
 	});
@@ -165,6 +184,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(versionCheckCommand);
 	context.subscriptions.push(discoverNotesCommand);
+	context.subscriptions.push(discoverNotesFileCommand);
 	context.subscriptions.push(initNotterCommand);
 	context.subscriptions.push(clearSearchInputCommand);
 	context.subscriptions.push(expandTodoTreeCommand);
@@ -178,8 +198,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Add trigger for discover command whenever a file saved to keep Notter up to date
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
-		// TODO: Replace this with a file-only update
-		await vscode.commands.executeCommand('notter.discover');
+		let sourceDirectory = await findAlreadyExistingNotterInstance();
+		if (sourceDirectory !== null){
+			await vscode.commands.executeCommand('notter.discoverFile', document.fileName);
+		}
 	}));
 
 	// --- INIT PLUGIN ---
