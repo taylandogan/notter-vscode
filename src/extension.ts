@@ -196,7 +196,45 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.window.registerWebviewViewProvider('notterTreeView', noteWebViewProvider)
 	);
 
-	// Add trigger for discover command whenever a file saved to keep Notter up to date
+	// Create a file system watcher to add trigger for discoverFile command whenever a file is created/restored to keep Notter up to date
+	// Unfortunately vscode.workspace.onDidCreateFiles cannot detect when a file is restored from Source Control :/
+    const watcher = vscode.workspace.createFileSystemWatcher('**/*.*', false, true, true);
+    watcher.onDidCreate(async uri => {
+		let sourceDirectory = await findAlreadyExistingNotterInstance();
+		if (sourceDirectory !== null){
+			const relative = path.relative(sourceDirectory, uri.fsPath);
+			const isSubDirectory = relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+			if (isSubDirectory) {
+				await vscode.commands.executeCommand('notter.discoverFile',	uri.fsPath);
+			}
+		}
+	});
+	context.subscriptions.push(watcher);
+
+	// Add trigger for discoverFile command whenever a file is renamed to keep Notter up to date
+	context.subscriptions.push(vscode.workspace.onDidRenameFiles(async (event: vscode.FileRenameEvent) => {
+		let sourceDirectory = await findAlreadyExistingNotterInstance();
+		if (sourceDirectory !== null){
+			let renamedFiles = event.files;
+			for (const renamedFile of renamedFiles) {
+				await vscode.commands.executeCommand('notter.discoverFile', renamedFile.oldUri.fsPath);
+				await vscode.commands.executeCommand('notter.discoverFile', renamedFile.newUri.fsPath);
+			}
+		}
+	}));
+
+	// Add trigger for discoverFile command whenever a file is deleted to keep Notter up to date
+	context.subscriptions.push(vscode.workspace.onDidDeleteFiles(async (event: vscode.FileDeleteEvent) => {
+		let sourceDirectory = await findAlreadyExistingNotterInstance();
+		if (sourceDirectory !== null){
+			let deletedFiles = event.files;
+			for (const deletedFile of deletedFiles) {
+				await vscode.commands.executeCommand('notter.discoverFile', deletedFile.fsPath);
+			}
+		}
+	}));
+
+	// Add trigger for discoverFile command whenever a file saved to keep Notter up to date
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
 		let sourceDirectory = await findAlreadyExistingNotterInstance();
 		if (sourceDirectory !== null){
