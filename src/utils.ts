@@ -26,7 +26,7 @@ new Promise<string>((resolve, reject) => {
 export const getCurrentWorkingDirectory = () => {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (!workspaceFolders) {
-		throw new Error('No workspace folder is open');
+		return null;
 	}
 
 	const firstWorkspaceFolder = workspaceFolders[0];
