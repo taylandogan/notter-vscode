@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { getCurrentWorkingDirectory, isConfigured, setWorkingDirectory } from './utils';
 import { checkNotterVersion, exportTodos, fetchTodos, fetchTodosInFile, initNotter } from './interface';
-import { SRC_PATH_CONFIG} from './constants';
+import { SRC_PATH_CONFIG, DEFAULT_SRC_FOLDER} from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
 
@@ -17,6 +17,17 @@ async function findAlreadyExistingNotterInstance () : Promise<string|null> {
 			const notterConfigContent = fs.readFileSync(notterConfigPath, {encoding: "utf-8"});
 			const notterConfig = JSON.parse(notterConfigContent);
 			return notterConfig.src_path
+		}
+	}
+	return null;
+}
+
+async function findDefaultSourceFolder () : Promise<string|null> {
+	let workspaceFolder = getCurrentWorkingDirectory();
+	if (workspaceFolder !== null) {
+		const srcFolderPath = path.join(workspaceFolder, DEFAULT_SRC_FOLDER);
+		if (fs.existsSync(srcFolderPath)) {
+			return srcFolderPath;
 		}
 	}
 	return null;
@@ -36,16 +47,22 @@ async function initNotterInWorkspace () {
 
 				// Set working directory
 				try{
-					progress.report({ message: 'Setting working directory...', increment: 20 });
+					progress.report({ message: 'Setting working directory...', increment: 10 });
 					let sourceDirectory = await findAlreadyExistingNotterInstance();
 
 					if (sourceDirectory == null) {
-						sourceDirectory = await vscode.window.showInputBox({
+						// Try the default source folder first, ask the user if it doesn't exist
+						progress.report({ message: `Trying the configured default directory: '${DEFAULT_SRC_FOLDER}'`, increment: 10});
+						sourceDirectory = await findDefaultSourceFolder();
+
+						if (sourceDirectory == null) {
+							sourceDirectory = await vscode.window.showInputBox({
 							placeHolder: 'Full path to src directory',
 							ignoreFocusOut: true,
 							prompt: 'Please set your source directory',
 							title: 'Notter > Set source directory'
 						});
+						}
 					}
 
 					if (sourceDirectory !== undefined) {
@@ -63,9 +80,9 @@ async function initNotterInWorkspace () {
 					}
 
 					// Trigger comment discovery
-					progress.report({ message: 'Discovering comments/notes...' , increment: 40});
+					progress.report({ message: 'Discovering comments/notes...' , increment: 30});
 					await vscode.commands.executeCommand('notter.discover');
-					progress.report({ message: "Done!" , increment: 10})
+					progress.report({ message: "Done!" , increment: 20})
 					return true;
 				} catch (error) {
 					vscode.window.showErrorMessage(error);
