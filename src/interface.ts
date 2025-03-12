@@ -3,9 +3,9 @@ import { Comment } from './model';
 import { execShell } from "./utils";
 import { SRC_PATH_CONFIG } from './constants';
 
-export const initNotter = async (srcFolder: string, username: string, email: string): Promise<[boolean, string]> => {
+export const initNotter = async (srcFolder: string): Promise<[boolean, string]> => {
 	try {
-		let output = await execShell(`notter --init ${username} ${email} ${srcFolder}` );
+		let output = await execShell(`notter --init ${srcFolder}` );
 		return [true, "Notter instance initialized properly"];
 	} catch (err) {
 		console.debug(err);

@@ -46,12 +46,6 @@ This extension add the following configurations:
 
 - `notter.projectSourceFolder`: Full path of the source folder that you want Notter to work on.
 
-- `notter.username`: Username that will be shown next to a TODO
-
-- `notter.email`: Email that uniquely identifies the creator of TODO.
-
-Note that both username and email are only saved in the sqlite database file that is created under /.notter once Notter is initialized for a project.
-
 ## Release Notes
 
 To be updated...

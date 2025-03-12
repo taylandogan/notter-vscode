@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { NoteProvider } from './sidebar';
 import { getCurrentWorkingDirectory, isConfigured, setWorkingDirectory } from './utils';
 import { checkNotterVersion, exportTodos, fetchTodos, fetchTodosInFile, initNotter } from './interface';
-import { SRC_PATH_CONFIG, USERNAME_CONFIG, EMAIL_CONFIG } from './constants';
+import { SRC_PATH_CONFIG} from './constants';
 import { Comment } from './model';
 import { NoteWebViewProvider } from './webview';
 
@@ -103,21 +103,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	let initNotterCommand = vscode.commands.registerCommand('notter.init', async () => {
 		try {
-			if ( !isConfigured(USERNAME_CONFIG) || !isConfigured(EMAIL_CONFIG) || !isConfigured(SRC_PATH_CONFIG) ) {
+			if (!isConfigured(SRC_PATH_CONFIG)) {
 				vscode.window.showErrorMessage(`Please set Notter configurations for Notter to work properly`);
 				return;
 			}
 
-			// TODO: Add a check for the username and email format they should not include a space
-			const username: string = vscode.workspace.getConfiguration('notter').get<string>(USERNAME_CONFIG);
-			const email: string = vscode.workspace.getConfiguration('notter').get<string>(EMAIL_CONFIG);
 			const srcFolder: string = vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG);
-
-			console.debug(`Username set for Notter: ${username}`);
-			console.debug(`Email set for Notter: ${email}`);
 			console.debug(`Source path set for Notter: ${srcFolder}`);
 
-			const [initialized, message]: [boolean, string] = await initNotter(srcFolder, username, email);
+			const [initialized, message]: [boolean, string] = await initNotter(srcFolder);
 			console.debug(`Initialized: ${initialized}`);
 			console.debug(`Message: ${message}`);
 
