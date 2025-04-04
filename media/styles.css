@@ -96,3 +96,26 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Subtle styling for child nodes */
+.child-node {
+    padding: 1px 0;
+    color: #555;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.child-node:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #0078d7;
+    transform: translateX(2px);
+}
+
+/* Make parent nodes less prominent */
+.parent-node {
+    font-weight: 500;
+    padding: 2px 0;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
