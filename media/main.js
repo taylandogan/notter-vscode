@@ -6,6 +6,7 @@
     const vscode = acquireVsCodeApi();
     const searchInput = document.getElementById("search-input");
     const treeView = document.getElementById("tree-view");
+    const loadingSpinner = document.getElementById("loading-spinner");
 
     // --- MAPPINGS ---
     // TODO: Fix the file-icons
@@ -259,19 +260,45 @@
     // Handle messages sent from the extension to the webview
     window.addEventListener("message", event => {
         const message = event.data; // The json data that the extension sent
+
+        // Helper function to handle spinner and message processing
+        function handleMessageWithSpinner(message, action) {
+            if (message.showSpinner && loadingSpinner) {
+                loadingSpinner.classList.add('visible');
+            }
+            action();
+            if (message.showSpinner && loadingSpinner) {
+                loadingSpinner.classList.remove('visible');
+            }
+        }
+
         switch (message.type) {
-            case "updateNotes": {
-                updateTreeView(message.notes);
+            case "updateNotes":
+                handleMessageWithSpinner(message, () => {
+                    notes = message.notes;
+                    updateTreeView(notes);
+                });
                 break;
-            }
-            case "collapseExpand": {
-                collapseExpand(message.expandTree);
+            case "collapseExpand":
+                handleMessageWithSpinner(message, () => {
+                    collapseExpand(message.expandTree);
+                });
                 break;
-            }
-            case "clearSearchInput": {
-                clearSearchInput();
+            case "clearSearchInput":
+                handleMessageWithSpinner(message, () => {
+                    clearSearchInput();
+                });
                 break;
-            }
+            case "showSpinner":
+                if (loadingSpinner) {
+                    loadingSpinner.classList.add('visible');
+                }
+                break;
+            case "hideSpinner":
+                if (loadingSpinner) {
+                    loadingSpinner.classList.remove('visible');
+                }
+                break;
         }
     });
 }());

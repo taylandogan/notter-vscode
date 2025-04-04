@@ -164,6 +164,9 @@ export async function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
+			// Show spinner immediately
+			noteWebViewProvider.showSpinner();
+
 			let updatedComments = await fetchTodosInFile(filepath);
 			if (updatedComments.length == 0) {
 				delete comments[filepath];
@@ -173,6 +176,8 @@ export async function activate(context: vscode.ExtensionContext) {
 			noteProvider.refresh(comments, false);
 		} catch(err) {
 			vscode.window.showErrorMessage("Error while discovering notes: " + err);
+		} finally {
+			noteWebViewProvider.hideSpinner();
 		}
 	});
 

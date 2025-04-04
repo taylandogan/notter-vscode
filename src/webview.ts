@@ -11,6 +11,18 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
         private _noteProvider: NoteProvider
 	) {}
 
+    public showSpinner() {
+        this._view?.webview.postMessage({
+            type: "showSpinner"
+        });
+    }
+
+    public hideSpinner() {
+        this._view?.webview.postMessage({
+            type: "hideSpinner"
+        });
+    }
+
     public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
 		this._view = webviewView;
 		webviewView.webview.options = {
@@ -26,6 +38,7 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 			webviewView.webview.postMessage({
                 type: "updateNotes",
                 notes: this._noteProvider.data,
+                showSpinner: true
             });
 		});
 
@@ -33,6 +46,7 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
             webviewView.webview.postMessage({
                 type: "updateNotes",
                 notes: this._noteProvider.data,
+                showSpinner: true
             });
         });
 
@@ -40,12 +54,14 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 			webviewView.webview.postMessage({
 				type: "collapseExpand",
                 expandTree: this._noteProvider.expandTree,
+                showSpinner: true
             });
 		});
 
 		this._noteProvider.onDidClearSearchInput(() => {
 			webviewView.webview.postMessage({
-                type: "clearSearchInput"
+                type: "clearSearchInput",
+                showSpinner: true
             });
 		});
 
@@ -122,10 +138,12 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
                 <link href="${codiconUri}" rel="stylesheet">
 			</head>
 			<body>
+                <div id="loading-spinner" class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
                 <div id="search-bar">
                     <input type="text" id="search-input" class="search-box" placeholder="Search" />
                 </div>
-
 
                 <ul id="tree-view" class="tree-view"></ul>
 
