@@ -27,7 +27,10 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 		this._view = webviewView;
 		webviewView.webview.options = {
 			enableScripts: true,
-			localResourceRoots: [this._extensionUri]
+			localResourceRoots: [
+				this._extensionUri,
+				vscode.Uri.joinPath(this._extensionUri, 'node_modules')
+			]
 		};
 
 		// Set the HTML for web view
@@ -118,7 +121,8 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 
 		// Do the same for the stylesheet.
 		const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'styles.css'));
-        const codiconUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'codicons', 'codicon.css'));
+		const deviconUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'devicon', 'devicon.min.css'));
+		const codiconUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'));
 
         // Use a nonce to only allow a specific script to be run.
 		const nonce = getNonce();
@@ -131,10 +135,11 @@ export class NoteWebViewProvider implements vscode.WebviewViewProvider {
 					Use a content security policy to only allow loading styles from our extension directory,
 					and only allow scripts that have a specific nonce.
 				-->
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-webview-resource: https:; script-src 'nonce-${nonce}'; style-src vscode-webview-resource: 'unsafe-inline'; font-src vscode-webview-resource:;">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-webview-resource: https:; script-src 'nonce-${nonce}'; style-src vscode-webview-resource: 'unsafe-inline'; font-src vscode-webview-resource: data: https:; connect-src vscode-webview-resource:;">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 				<link href="${styleUri}" rel="stylesheet">
+                <link href="${deviconUri}" rel="stylesheet">
                 <link href="${codiconUri}" rel="stylesheet">
 			</head>
 			<body>

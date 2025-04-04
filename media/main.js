@@ -11,27 +11,27 @@
     // --- MAPPINGS ---
     // TODO: Fix the file-icons
     const fileIconMappings = {
-        ".py": "codicon-python",
-        ".js": "codicon-javascript",
-        ".ts": "codicon-typescript",
-        '.hs': "codicon-haskell",
-        ".java": "codicon-java",
-        ".c": "codicon-c",
-        ".cpp": "codicon-cpp",
-        ".cs": "codicon-csharp",
-        ".go": "codicon-go",
-        ".php": "codicon-php",
-        ".rb": "codicon-ruby",
-        ".rs": "codicon-rust",
-        ".swift": "codicon-swift",
-        ".vb": "codicon-visual-studio",
-        ".xml": "codicon-xml",
-        ".html": "codicon-html",
-        ".css": "codicon-css",
-        ".json": "codicon-json",
-        ".md": "codicon-markdown",
-        ".txt": "codicon-file",
-        ".gitignore": "codicon-git",
+        ".py": "devicon-python-plain",
+        ".js": "devicon-javascript-plain",
+        ".ts": "devicon-typescript-plain",
+        ".hs": "devicon-haskell-plain",
+        ".java": "devicon-java-plain",
+        ".c": "devicon-c-plain",
+        ".cpp": "devicon-cplusplus-plain",
+        ".cs": "devicon-csharp-plain",
+        ".go": "devicon-go-plain",
+        ".php": "devicon-php-plain",
+        ".rb": "devicon-ruby-plain",
+        ".rs": "devicon-rust-plain",
+        ".swift": "devicon-swift-plain",
+        ".sql": "devicon-azuresqldatabase-plain",
+        ".xml": "devicon-xml-plain",
+        ".html": "devicon-html5-plain",
+        ".css": "devicon-css3-plain",
+        ".json": "devicon-json-plain",
+        ".md": "devicon-markdown-original",
+        ".txt": "devicon-readthedocs-original",
+        ".gitignore": "devicon-git-plain",
     };
 
     const oldState = vscode.getState() || { notes: [] };
@@ -94,9 +94,9 @@
             const ul = document.createElement("ul");
             ul.style.display = 'none'; // Initially hide the children
 
-            // TODO: Integrate a source for file icons and fetch it here
-            // const fileIcon = getFileIcon(fileNoteRoot);
-            iconSpan.classList.add("node-icon", "codicon", "codicon-file");
+            // Get the appropriate file icon based on the file extension
+            const fileIcon = getFileIcon(fileNoteRoot);
+            iconSpan.classList.add("node-icon", "devicon", fileIcon);
             chevronIconSpan.classList.add("node-icon", "codicon", "chevron-icon", "codicon-chevron-right");
 
             fileNoteRoot.children.forEach(childNode => ul.appendChild(buildFileNoteTree(childNode)));
@@ -171,15 +171,25 @@
 
     function getFileExtension(noteTreeNode) {
         let extension = "";
-        if (noteTreeNode.hasOwnProperty("filepath") && noteTreeNode.filepath) {
+
+        // For parent nodes, use the label to get the extension
+        if (noteTreeNode.hasOwnProperty("children")) {
+            const parts = noteTreeNode.label.split(/[/\\]/);
+            const fileName = parts.pop();
+            extension = getExtension(fileName);
+        }
+        // For child nodes, use the filepath
+        else if (noteTreeNode.hasOwnProperty("filepath") && noteTreeNode.filepath) {
             extension = getExtension(noteTreeNode.filepath);
         }
+
         return extension;
     }
 
     function getFileIcon(noteTreeNode) {
         let fileType = getFileExtension(noteTreeNode);
-        return fileIconMappings[fileType] || "codicon-file";
+        const icon = fileIconMappings[fileType] || "devicon-readthedocs-original";
+        return icon;
     }
 
     function clearSearchInput() {
