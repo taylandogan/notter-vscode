@@ -137,11 +137,13 @@
         let textContent = "";
         if (noteTreeNode.hasOwnProperty("children")) {
             const parts = noteTreeNode.label.split(/[/\\]/); // Split on both / and \
-            const fileName = parts.pop();
-            // const pathStr = parts.pop();
 
-            // TODO: Find a way to make filename bold, and display path starting from working dir
-            textContent = fileName;
+            // Get the last two parts of the path
+            const fileName = parts.pop(); // Get the filename
+            const parentDir = parts.pop(); // Get the parent directory
+
+            // Format as "parentDir/filename"
+            textContent = parentDir ? `${parentDir}/${fileName}` : fileName;
         } else {
             textContent = noteTreeNode.label;
         }
