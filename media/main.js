@@ -34,8 +34,9 @@
         ".gitignore": "devicon-git-plain",
     };
 
-    const oldState = vscode.getState() || { notes: [] };
+    const oldState = vscode.getState() || { notes: [], expandedNodes: {} };
     let notes = oldState.notes;
+    let expandedNodes = oldState.expandedNodes || {};
     updateTreeView(notes);
 
     // --- FUNCTIONS ---
@@ -44,9 +45,21 @@
             const chevronIcon = parentNode.querySelector(".chevron-icon");
             const childrenContainer = parentNode.querySelector(".child-node")?.closest("ul");
 
+            // Get the node ID from the text content
+            const nodeText = parentNode.querySelector(".node-text").textContent;
+            const nodeId = findNodeIdByText(nodeText);
+
             chevronIcon.classList.replace("codicon-chevron-down", "codicon-chevron-right");
             childrenContainer.style.display = "none"; // hide children
+
+            // Update the expanded state
+            if (nodeId) {
+                expandedNodes[nodeId] = false;
+            }
         });
+
+        // Save the state
+        vscode.setState({ notes: notes, expandedNodes: expandedNodes });
     }
 
     function expandAllNodes() {
@@ -54,9 +67,21 @@
             const chevronIcon = parentNode.querySelector(".chevron-icon");
             const childrenContainer = parentNode.querySelector(".child-node")?.closest("ul");
 
+            // Get the node ID from the text content
+            const nodeText = parentNode.querySelector(".node-text").textContent;
+            const nodeId = findNodeIdByText(nodeText);
+
             chevronIcon.classList.replace("codicon-chevron-right", "codicon-chevron-down");
             childrenContainer.style.display = ""; // show children
+
+            // Update the expanded state
+            if (nodeId) {
+                expandedNodes[nodeId] = true;
+            }
         });
+
+        // Save the state
+        vscode.setState({ notes: notes, expandedNodes: expandedNodes });
     }
 
     function clearTreeView() {
@@ -81,7 +106,16 @@
 
     function buildFileNoteTree(fileNoteRoot) {
         const li = document.createElement("li");
-        li.textContent = getTextContent(fileNoteRoot);
+
+        // Create a text span instead of directly setting textContent
+        const textSpan = document.createElement("span");
+        textSpan.classList.add("node-text");
+
+        // Set innerHTML instead of textContent to handle HTML tags
+        textSpan.innerHTML = getTextContent(fileNoteRoot);
+
+        // Add the text span to the li
+        li.appendChild(textSpan);
 
         const iconSpan = document.createElement("span");
         li.prepend(iconSpan); // prepend to put it before the label
@@ -92,7 +126,6 @@
         if (fileNoteRoot.hasOwnProperty("children") && fileNoteRoot.children.length > 0) {
             li.classList.add("parent-node")
             const ul = document.createElement("ul");
-            ul.style.display = 'none'; // Initially hide the children
 
             // Get the appropriate file icon based on the file extension
             const fileIcon = getFileIcon(fileNoteRoot);
@@ -102,17 +135,39 @@
             fileNoteRoot.children.forEach(childNode => ul.appendChild(buildFileNoteTree(childNode)));
             li.appendChild(ul);
 
+            // Generate a unique ID for this node based on its path
+            const nodeId = fileNoteRoot.label;
+
+            // Check if this node was previously expanded
+            const wasExpanded = expandedNodes[nodeId] === true;
+
+            // Set initial state based on saved preference
+            if (wasExpanded) {
+                ul.style.display = ""; // show children
+                chevronIconSpan.classList.remove("codicon-chevron-right");
+                chevronIconSpan.classList.add("codicon-chevron-down");
+            } else {
+                ul.style.display = "none"; // hide children
+            }
+
             li.addEventListener('click', function(e) {
                 e.stopPropagation();
-                if (ul.style.display === 'none') {
-                    ul.style.display = '';
-                    chevronIconSpan.classList.remove("codicon-chevron-right");
-                    chevronIconSpan.classList.add("codicon-chevron-down");
-                } else {
+                const isExpanded = ul.style.display !== 'none';
+
+                if (isExpanded) {
                     ul.style.display = 'none';
                     chevronIconSpan.classList.remove("codicon-chevron-down");
                     chevronIconSpan.classList.add("codicon-chevron-right");
+                    expandedNodes[nodeId] = false;
+                } else {
+                    ul.style.display = '';
+                    chevronIconSpan.classList.remove("codicon-chevron-right");
+                    chevronIconSpan.classList.add("codicon-chevron-down");
+                    expandedNodes[nodeId] = true;
                 }
+
+                // Save the state
+                vscode.setState({ notes: notes, expandedNodes: expandedNodes });
             });
         } else {
             li.classList.add("child-node");
@@ -313,4 +368,24 @@
                 break;
         }
     });
+
+    // Helper function to find a node ID by its text content
+    function findNodeIdByText(text) {
+        // Find the node in the notes array that matches this text
+        for (const note of notes) {
+            if (getTextContent(note) === text) {
+                return note.label;
+            }
+
+            // Check children if they exist
+            if (note.children && Array.isArray(note.children)) {
+                for (const child of note.children) {
+                    if (getTextContent(child) === text) {
+                        return child.label;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }());
