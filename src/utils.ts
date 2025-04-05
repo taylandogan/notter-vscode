@@ -9,7 +9,13 @@ const binDirectory = path.join(projectDirectory, 'bin');
 export const execShell = (cmd: string, withEnv: boolean = true) =>
 new Promise<string>((resolve, reject) => {
 	let injectedEnv = withEnv ? {"SRC_PATH": vscode.workspace.getConfiguration('notter').get<string>(SRC_PATH_CONFIG)} : {};
-	let childProcess = child_process.exec(`notter/${cmd}`, {cwd: `${binDirectory}`, env: injectedEnv}, (err, stdout, stderr) => {
+	let command_parts = cmd.split(' ');
+	if (command_parts[0] !== "notter") {
+		return reject("You cannot run an arbitrary command");
+	}
+	command_parts.shift()
+
+	let childProcess = child_process.execFile(`notter/notter`, command_parts, {cwd: `${binDirectory}`, env: injectedEnv}, (err, stdout, stderr) => {
 		if (err) {
 			childProcess.stderr.on('data', (data) => {
 				vscode.window.showErrorMessage(data);
